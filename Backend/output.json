@@ -6173,5 +6173,19 @@
     "product_price_before_discount": 419,
     "rival": true,
     "product_discount_percent": 65
+  },
+  {
+    "products_id": "070462660147",
+    "product_name": "ال40",
+    "product_price": 29,
+    "price_cost": 1,
+    "product_quantity": 1,
+    "product_category": "أعمال وتسويق ومالية",
+    "product_description": "صثق",
+    "product_image": "070462660147",
+    "promotionEndDate": "2025-06-10T00:00:00.000Z",
+    "product_price_before_discount": 59,
+    "rival": true,
+    "product_discount_percent": 55
   }
 ]
