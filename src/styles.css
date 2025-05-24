@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+h1 {
+    @apply p-3 text-center text-3xl m-2 font-bold text-amber-600 bg-amber-100 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 w-[90%] mx-auto;
+    @apply dark:text-amber-300 dark:bg-amber-900;
+}
+    .active {
+        @apply bg-amber-600 text-white p-1;
+    }
+}
+
+/* Dark mode global styles */
+.dark {
+  --bg-color: #1a202c;
+  --text-color: #cbd5e0;
+  --link-color: #63b3ed;
+  --link-hover-color: #4299e1;
+}
+
+.dark body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.dark a {
+  color: var(--link-color);
+}
+
+.dark a:hover {
+  color: var(--link-hover-color);
+}
+
+.rtl {
+    direction: rtl;
+}
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+img:not(.not) {
+    box-shadow: 0 1px 10px 0px rgba(0, 0, 0, 0.272), 0 1px 10px 2px rgba(0, 0, 0, 0.272);
+}
+.dark img {
+    box-shadow: 0 1px 10px 0px rgba(0, 0, 0, 0.553), 0 1px 10px 2px rgba(0, 0, 0, 0.553);
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}

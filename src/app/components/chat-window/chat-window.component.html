@@ -1,0 +1,72 @@
+<!-- أيقونة الدردشة الثابتة -->
+<div class="fixed bottom-5 right-5 bg-blue-600 text-white text-3xl w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-50 cursor-pointer hover:bg-blue-700" *ngIf="!isVisible" (click)="toggleVisibility()" title="فتح الدردشة">
+  💬
+</div>
+
+<!-- نافذة الدردشة العائمة -->
+<div
+  class="fixed w-80 sm:w-96 max-h-[500px] bg-white dark:bg-gray-900 rounded-lg shadow-lg flex flex-col z-50 font-sans"
+  *ngIf="isVisible"
+  [ngClass]="{'fullscreen': isFullscreen}"
+  [ngStyle]="{'left.px': posX, 'top.px': posY, 'bottom': 'auto', 'right': 'auto', 'position': 'fixed', 'width.px': !isFullscreen ? chatWindowWidth : null, 'height.px': !isFullscreen ? chatWindowHeight : null}"
+>
+  <div
+    class="bg-blue-600 text-white p-3 font-bold flex justify-between items-center rounded-t-lg hover:bg-blue-700 cursor-move"
+    (mousedown)="onDragStart($event)"
+    (touchstart)="onTouchStart($event)"
+    (touchmove)="onTouchMove($event)"
+    (touchend)="onTouchEnd($event)"
+  >
+    <span>دردشة الذكاء الاصطناعي</span>
+  <button
+    class="text-white text-xl cursor-pointer ml-2"
+    (click)="toggleFullscreen(); $event.stopPropagation()"
+    (touchstart)="$event.stopPropagation()"
+    (touchend)="$event.stopPropagation()"
+    [title]="isFullscreen ? 'خروج من ملء الشاشة' : 'ملء الشاشة'"
+    [attr.aria-label]="isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'"
+  >
+    <svg *ngIf="!isFullscreen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 3H5a2 2 0 00-2 2v3m0 8v3a2 2 0 002 2h3m8-16h3a2 2 0 012 2v3m0 8v3a2 2 0 01-2 2h-3" />
+    </svg>
+    <svg *ngIf="isFullscreen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 18h16M6 4v16M18 4v16" />
+    </svg>
+  </button>
+  <button class="text-white text-xl cursor-pointer" (click)="toggleVisibility()" (touchstart)="$event.stopPropagation()" (touchend)="toggleVisibility()" title="إغلاق الدردشة">×</button>
+</div>
+
+  <div #messagesContainer class="flex-1 p-3 overflow-y-auto bg-gray-100 dark:bg-gray-700 flex flex-col">
+    <div *ngFor="let message of messages" [ngClass]="{
+      'bg-green-200 text-gray-900 self-start': message.role === 'user',
+      'bg-gray-300 dark:bg-gray-600 dark:text-gray-100 self-end': message.role === 'assistant',
+      'bg-gray-200 italic text-center dark:bg-gray-500 dark:text-gray-200 self-center': message.role === 'system'
+    }" class="mb-2 p-2 rounded max-w-[80%] break-words" [innerHTML]="sanitize(message.content)">
+    </div>
+  </div>
+
+  <!-- Typing indicator shown only while sending and hidden when assistant replies -->
+  <div *ngIf="isTyping" class="rtl typing-indicator p-3 border-t border-gray-300 dark:border-gray-700 flex items-center">
+    <span class="ml-2 text-gray-600 dark:text-gray-300 text-sm">المساعد يكتب</span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="flex p-3 border-t border-gray-300 dark:border-gray-700 rtl">
+    <textarea
+      [(ngModel)]="newMessage"
+      placeholder="اكتب رسالتك هنا..."
+      (keydown.enter)="$event.preventDefault(); sendMessage()"
+      class="flex-1 resize-none p-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-sans text-sm"
+      rows="2"
+    ></textarea>
+    <button
+      [disabled]="isLoading || !newMessage.trim()"
+      (click)="sendMessage()"
+      class="ml-2 px-4 py-2 bg-blue-600 text-white rounded disabled:bg-blue-300 disabled:cursor-not-allowed"
+    >
+      {{ isLoading ? 'جاري الإرسال...' : 'إرسال' }}
+    </button>
+  </div>
+</div>

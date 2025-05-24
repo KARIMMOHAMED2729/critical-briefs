@@ -1,0 +1,64 @@
+/* Success Message Styles */
+.success-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  z-index: 1000;
+  text-align: center;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.success-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.checkmark {
+  width: 80px;
+  height: 80px;
+}
+
+.checkmark__circle {
+  stroke: white;
+  stroke-width: 2;
+  animation: checkmark-circle 0.6s ease-in-out;
+}
+
+.checkmark__check {
+  stroke: white;
+  stroke-width: 2;
+  stroke-linecap: round;
+  animation: checkmark-check 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, -60%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+@keyframes checkmark-circle {
+  0% { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes checkmark-check {
+  0% { stroke-dashoffset: 50; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes hand-pointing-horizontal {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(10px); }
+}
+
+.animate-hand-pointing {
+  animation: hand-pointing-horizontal 1.5s ease-in-out infinite;
+}

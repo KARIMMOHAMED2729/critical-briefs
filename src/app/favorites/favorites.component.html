@@ -1,0 +1,58 @@
+<div class="container mx-auto p-4">
+  <h1 class="text-2xl font-bold mb-6 text-amber-900 dark:text-amber-300 mt-36">قائمة المفضلة</h1>
+
+  <div *ngIf="isLoading" class="text-center py-8">
+    <p>جاري تحميل محتويات المفضلة...</p>
+  </div>
+
+  <div *ngIf="!isLoading && favoriteBooks.length === 0" class="text-center py-8">
+    <p>لا يوجد كتب في المفضلة حالياً</p>
+    <a routerLink="/" class="text-blue-600 hover:underline dark:text-blue-400">تصفح الكتب</a>
+  </div>
+
+  <div *ngIf="!isLoading && favoriteBooks.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    <div *ngFor="let book of favoriteBooks ; let i = index" class="flex bg-white dark:bg-gray-800 rounded-2xl shadow p-4 mb-4 fade-in"
+    [style.animationDelay]="i * 400 + 'ms'">
+      <!-- Book Image -->
+      <div class="w-1/3 pr-4 flex justify-center items-center">
+        <img 
+        [src]="'books/' + book.product_image + '.jpg'" 
+        (error)="handleImageError($event)"
+        [alt]="book.product_name" 
+        class="rounded-lg max-w-full h-auto object-contain"
+        data-attempt="0"
+        />
+      </div>
+      
+      <!-- Book Details -->
+      <div class="w-2/3 flex flex-col justify-between">
+        <div>
+          <div class="p-4">
+            <h3 class="font-semibold text-lg mb-2 dark:text-white">{{book.product_name}}</h3>
+            <p class="text-green-600 dark:text-green-400 font-bold text-lg">{{book.product_price}} ج.م</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">{{ book.product_category }}</p>
+          </div>
+        </div>
+    
+        <!-- Remove and add Button -->
+         <div class="flex gap-1 text-xs">
+           <button 
+           (click)="removeFromFavorites(book.products_id)"
+           class="w-auto bg-red-500 dark:bg-red-700 hover:bg-red-600 text-white p-2 rounded transition-colors">
+           إزالة من المفضلة
+           </button>
+           <button *ngIf="!isInCart(book.products_id)"
+           (click)="addToCart(book.products_id)"
+           class="w-auto bg-blue-500 dark:bg-[#0a1325] hover:bg-blue-600 text-white p-2 rounded transition-colors">
+           أضف إلي السلة
+           </button>
+           <button *ngIf="isInCart(book.products_id)"
+           (click)="addToCart(book.products_id)"
+           class="w-auto bg-red-500 dark:bg-red-700 hover:bg-red-600 text-white p-2 rounded transition-colors">
+           إزالة من السلة
+           </button>
+         </div>
+      </div>
+    </div>
+  </div>
+</div>

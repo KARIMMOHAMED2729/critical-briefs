@@ -1,0 +1,400 @@
+import { Component, Output, EventEmitter, OnInit, Input } from '@angular/core';
+import { AuthService } from '../auth/auth.service';
+import { DataService } from '../services/data.service';
+import { PaymentService } from '../services/payment.service';
+import { map, take } from 'rxjs/operators';
+import { User } from '../auth/user.model';
+import governoratesData from '../../../public/json/egypt-governorates.json';
+import {faCheck , faHandPointLeft} from '@fortawesome/free-solid-svg-icons';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+
+@Component({
+  selector: 'app-checkout-modal',
+  templateUrl: './checkout-modal.component.html',
+  styleUrls: ['./checkout-modal.component.css'],
+  standalone: true,
+  imports: [CommonModule, FormsModule, FontAwesomeModule]
+})
+export class CheckoutModalComponent implements OnInit {
+  @Input() bookId?: string;
+  @Output() close = new EventEmitter<void>();
+  cartItems: any[] = [];
+  totalPrice: number = 0;
+  shippingCost: number = 0;
+  isLoading = true;
+  showSuccessMessage: boolean = false;
+  faCheck = faCheck;
+  faHandPointLeft = faHandPointLeft
+  // بيانات المستخدم
+  userProfile: User | null = null;
+  isAddressConfirmed: boolean = false;
+  isEditingAddress: boolean = false;
+  editedUserProfile: User | null = null;
+
+  governorates: any[] = governoratesData.governorates;
+  cities: string[] = [];
+
+  phoneValid: boolean = true;
+  phoneTouched: boolean = false;
+  locationValid: boolean = true;
+  errorMessage: string = '';
+
+  constructor(
+    private authService: AuthService,
+    private dataService: DataService,
+    private paymentService: PaymentService
+  ) {}
+
+  get freeShippingMessage(): string {
+    const totalQuantity = this.cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
+    if (totalQuantity >= 3) {
+      return 'لقد حصلت على شحن مجاني';
+    } else {
+      return 'اشترِ كتابين أو أكثر لتحصل على شحن مجاني';
+    }
+  }
+
+  get isAddressComplete(): boolean {
+    if (!this.editedUserProfile) return false;
+    const governorate = this.editedUserProfile?.governorate ?? '';
+    const city = this.editedUserProfile?.city ?? '';
+    const village = this.editedUserProfile?.village ?? '';
+    const phone = this.editedUserProfile?.phone ?? '';
+    const phoneValid = this.phoneValid && this.phoneTouched;
+    const locationValid = this.locationValid;
+    return (
+      governorate.trim().length > 0 &&
+      city.trim().length > 0 &&
+      village.trim().length > 0 &&
+      phone.trim().length > 0 &&
+      phoneValid &&
+      locationValid
+    );
+  }
+
+  ngOnInit(): void {
+    console.log('CheckoutModalComponent initialized');
+    this.loadCartItems();
+    this.loadUserProfile();
+  }
+
+  loadUserProfile() {
+    this.authService.user$.pipe(take(1)).subscribe(currentUser => {
+      if (currentUser && currentUser.id) {
+        this.authService.getUserProfile(currentUser.id).subscribe({
+          next: (profile) => {
+            this.userProfile = profile;
+            this.editedUserProfile = { ...profile }; // clone for editing
+            this.updateCities();
+            this.calculateShippingCost();
+            this.calculateTotalPrice();
+            // Set phoneTouched to true if phone exists and is valid to enable dynamic validation
+            if (this.editedUserProfile && this.editedUserProfile.phone) {
+              const egyptPhoneRegex = /^(010|011|012|015)[0-9]{8}$/;
+              this.phoneTouched = egyptPhoneRegex.test(this.editedUserProfile.phone);
+              this.phoneValid = this.phoneTouched;
+            }
+          },
+          error: (err) => {
+            console.error('خطأ في جلب بيانات المستخدم:', err);
+          }
+        });
+      }
+    });
+  }
+
+  loadCartItems() {
+    console.log('Loading cart items...');
+    if (this.bookId) {
+      // Load only the book with the given bookId
+      this.dataService.getData().pipe(
+        map((books: any[]) => books.filter(book => book.products_id === this.bookId))
+      ).subscribe({
+        next: (filteredBooks) => {
+          this.cartItems = filteredBooks;
+          this.calculateTotalPrice();
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error loading book by id:', err);
+          this.cartItems = [];
+          this.isLoading = false;
+        }
+      });
+    } else {
+      this.authService.cartBookIds.subscribe(bookIds => {
+        console.log('Received book IDs:', bookIds);
+        if (bookIds.length > 0) {
+          this.dataService.getData().pipe(
+            map((books: any[]) => books.filter(book => bookIds.includes(book.products_id)))
+          ).subscribe({
+            next: (filteredBooks) => {
+              this.cartItems = filteredBooks.sort((a, b) => {
+                if (a.product_quantity > 0 && b.product_quantity <= 0) return -1;
+                if (a.product_quantity <= 0 && b.product_quantity > 0) return 1;
+                return b.product_quantity - a.product_quantity;
+              });
+              this.calculateTotalPrice();
+              this.isLoading = false;
+            },
+            error: (err) => {
+              console.error('Error loading cart items:', err);
+              this.isLoading = false;
+            }
+          });
+        } else {
+          this.cartItems = [];
+          this.isLoading = false;
+        }
+      });
+    }
+  }
+
+  calculateShippingCost(): void {
+    // Calculate total quantity of books in cart
+    const totalQuantity = this.cartItems.reduce((sum, item) => {
+      return sum + (item.quantity || 1);
+    }, 0);
+
+    // If total quantity >= 3, free shipping
+    if (totalQuantity >= 3) {
+      this.shippingCost = 0;
+      this.calculateTotalPrice();
+      return;
+    }
+
+    const governorateName = this.editedUserProfile?.governorate || this.userProfile?.governorate;
+    if (!governorateName) {
+      this.shippingCost = 0;
+      this.calculateTotalPrice();
+      return;
+    }
+    const governorate = this.governorates.find(g => g.governorate_name === governorateName);
+    if (governorate && governorate.shipping_cost) {
+      this.shippingCost = parseFloat(governorate.shipping_cost);
+    } else {
+      this.shippingCost = 0;
+    }
+    this.calculateTotalPrice();
+  }
+
+  calculateTotalPrice(): void {
+    const itemsTotal = this.cartItems.reduce((total, book) => {
+      if (book.product_quantity > 0) {
+        return total + (parseFloat(book.product_price) * (book.quantity || 1));
+      }
+      return total;
+    }, 0);
+    this.totalPrice = itemsTotal + this.shippingCost;
+  }
+
+  get hasPurchasableItems(): boolean {
+    return this.cartItems.some(item => item.product_quantity > 0);
+  }
+
+  onClose(): void {
+    this.close.emit();
+  }
+
+  handleImageError(event: any) {
+    const imageElement = event.target;
+  
+    if (!imageElement.errorStep) {
+      imageElement.errorStep = 1;
+    } else {
+      imageElement.errorStep++;
+    }
+  
+    const imageName = imageElement.src.split('/').pop().split('.')[0];
+  
+    switch (imageElement.errorStep) {
+      case 1:
+        imageElement.src = `books/${imageName}.webp`;
+        break;
+      case 2:
+        imageElement.src = `books/${imageName}.png`;
+        break;
+      case 3:
+        imageElement.src = `books/${imageName}.jpg`;
+        break;
+      default:
+        imageElement.src = 'books/default.png';
+        break;
+    }
+  }
+
+  decreaseQuantity(item: any): void {
+    if (!item.quantity) item.quantity = 1;
+    
+    if (item.quantity <= 1) {
+      this.showAlert(item, 'الحد الأدنى للكمية هو 1');
+      return;
+    }
+    
+    item.quantity--;
+    this.calculateShippingCost();
+    this.calculateTotalPrice();
+  }
+
+  increaseQuantity(item: any): void {
+    if (!item.quantity) item.quantity = 1;
+    
+    if (item.quantity >= item.product_quantity) {
+      this.showAlert(item, 'لا يمكن زيادة الكمية عن ' + item.product_quantity);
+      return;
+    }
+    
+    item.quantity++;
+    this.calculateShippingCost();
+    this.calculateTotalPrice();
+  }
+
+  showAlert(item: any, msg: string): void {
+    if (!item) return;
+    
+    item.message = msg;
+    item.showMessage = true;
+    
+    setTimeout(() => {
+      if (item) {
+        item.showMessage = false;
+      }
+    }, 2000);
+  }
+
+  // تفعيل زر التعديل إذا لم يتم التأكيد
+  onEditAddress() {
+    this.isEditingAddress = true;
+  }
+
+  cancelEditAddress() {
+    this.isEditingAddress = false;
+    if (this.userProfile && this.editedUserProfile) {
+      this.editedUserProfile = { ...this.userProfile };
+      this.calculateShippingCost();
+      this.calculateTotalPrice();
+    }
+  }
+
+  onGovernorateChange() {
+    if (this.editedUserProfile) {
+      const selectedGov = this.governorates.find(g => g.governorate_name === this.editedUserProfile!.governorate);
+      this.cities = selectedGov ? selectedGov.cities : [];
+      if (!this.cities.includes(this.editedUserProfile.city)) {
+        this.editedUserProfile.city = '';
+      }
+      this.validateLocation();
+      this.calculateShippingCost();
+      this.calculateTotalPrice();
+    }
+  }
+
+  updateCities() {
+    if (this.editedUserProfile) {
+      const selectedGov = this.governorates.find(g => g.governorate_name === this.editedUserProfile!.governorate);
+      this.cities = selectedGov ? selectedGov.cities : [];
+    }
+  }
+
+  validatePhone() {
+    if (!this.editedUserProfile) return;
+    const egyptPhoneRegex = /^(010|011|012|015)[0-9]{8}$/;
+    this.phoneTouched = true;
+    this.phoneValid = egyptPhoneRegex.test(this.editedUserProfile.phone);
+  }
+
+  validateLocation() {
+    if (!this.editedUserProfile) return false;
+    const govValid = this.governorates.some(g => g.governorate_name === this.editedUserProfile!.governorate);
+    const cityValid = this.cities.includes(this.editedUserProfile.city);
+    this.locationValid = govValid && cityValid;
+    return this.locationValid;
+  }
+
+  saveEditAddress() {
+    if (!this.editedUserProfile) return;
+
+    this.errorMessage = '';
+    this.validatePhone();
+    this.validateLocation();
+
+    if (!this.phoneValid || !this.locationValid) {
+      return;
+    }
+
+    // Update userProfile with edited data
+    this.userProfile = { ...this.editedUserProfile };
+    this.isEditingAddress = false;
+
+    // Call service to persist changes to backend
+this.dataService.updateUserProfile(this.userProfile).subscribe({
+      next: () => {
+        console.log('User profile updated successfully');
+        this.errorMessage = '';
+      },
+      error: (error: any) => {
+        console.error('Error updating user profile:', error);
+        this.errorMessage = 'حدث خطأ أثناء تحديث البيانات، يرجى المحاولة مرة أخرى';
+      }
+    });
+  }
+
+completePurchase(): void {
+  const purchasedItems = this.cartItems
+    .filter(item => item.product_quantity > 0);
+  
+  const purchasedBookIds = purchasedItems.map(item => item.products_id);
+  
+  this.authService.user$.pipe(take(1)).subscribe(currentUser => {
+    if (currentUser) {
+      const orderData = {
+        userId: currentUser.id,
+        products: purchasedItems.map(item => ({
+          bookId: item.products_id,
+          bookName: item.product_name,
+          quantity: item.quantity || 1,
+          price: parseFloat(item.product_price)
+        })),
+        shippingCost: this.shippingCost,
+        totalAmount: this.totalPrice
+      };
+
+      this.dataService.submitOrder(orderData).subscribe({
+        next: (response: any) => {
+          const orderId = response.orderId;
+          const currency = 'EGP'; // يمكن تعديل العملة حسب الحاجة
+          const merchantRedirect = window.location.origin + '/payment-success'; // رابط إعادة التوجيه بعد الدفع
+
+          if (orderId && this.userProfile && this.userProfile.email) {
+            this.paymentService.createPayment(orderId, this.totalPrice, currency, this.userProfile.email, merchantRedirect).subscribe({
+              next: (paymentResponse: any) => {
+                if (paymentResponse.sessionUrl) {
+                  window.location.href = paymentResponse.sessionUrl;
+                } else {
+                  alert('فشل في الحصول على رابط الدفع');
+                }
+              },
+              error: (paymentError) => {
+                console.error('خطأ في إنشاء طلب الدفع:', paymentError);
+                alert('حدث خطأ أثناء إنشاء طلب الدفع، يرجى المحاولة مرة أخرى');
+              }
+            });
+          } else {
+            alert('بيانات الطلب غير مكتملة للدفع');
+          }
+
+          // باقي الكود كما هو لتحديث العنوان، السلة، والطلبات
+        },
+        error: (err) => {
+          alert('حدث خطأ أثناء إتمام الشراء، يرجى المحاولة مرة أخرى');
+        }
+      });
+    } else {
+      alert('يجب تسجيل الدخول لإتمام الشراء');
+    }
+  });
+}
+
+}

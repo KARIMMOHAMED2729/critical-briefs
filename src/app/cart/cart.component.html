@@ -1,0 +1,66 @@
+<div class="container mx-auto p-4">
+  <h1 class="text-2xl font-bold mb-6 text-amber-900 dark:text-amber-300 mt-36">سلة المشتريات</h1>
+
+  <div *ngIf="isLoading" class="text-center py-8">
+    <p>جاري تحميل محتويات السلة...</p>
+  </div>
+  <div *ngIf="!isLoading && cartBooks.length === 0" class="text-center py-8">
+    <p>لا يوجد كتب في السلة حالياً</p>
+    <a routerLink="/" class="text-blue-600 hover:underline dark:text-blue-400">تصفح الكتب</a>
+  </div>
+
+  <div *ngIf="!isLoading && cartBooks.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3  gap-6">
+    <div *ngFor="let book of cartBooks ; let i = index" class="flex bg-white dark:bg-gray-800 rounded-2xl shadow p-4 mb-4 fade-in"
+    [style.animationDelay]="i * 400 + 'ms'">
+      <!-- صورة الكتاب -->
+      <div class="w-1/3 pr-4 flex justify-center items-center">
+        <img 
+        [src]="'books/' + book.product_image + '.jpg'" 
+        (error)="handleImageError($event)"
+        [alt]="book.product_name" 
+        class="rounded-lg max-w-full h-auto object-contain"
+        data-attempt="0"
+      />
+      </div>
+      <!-- بيانات الكتاب -->
+      <div class="w-2/3 flex flex-col justify-between">
+        <div>
+        <!-- Average Rating Display -->
+        <!-- <div class="mb-2 flex items-center space-x-2">
+          <ng-container *ngFor="let star of [1,2,3,4,5]">
+            <fa-icon *ngIf="star <= getAverageRating(book)" [icon]="faStar" class="text-yellow-400 h-5 w-5"></fa-icon>
+            <fa-icon *ngIf="star > getAverageRating(book)" [icon]="faStarRegular" class="text-gray-300 dark:text-gray-600 h-5 w-5"></fa-icon>
+          </ng-container>
+          <span class="text-sm text-gray-600 dark:text-gray-300">({{ getRatingCount(book) }} تقييم)</span>
+        </div> -->
+          <!-- السعر -->
+          <div class="p-4">
+            <h3 class="font-semibold text-lg mb-2 dark:text-white">{{book.product_name}}</h3>
+            <p class="text-green-600 dark:text-green-400 font-bold text-lg">{{book.product_price}} ج.م</p>
+            <!-- الفئة -->
+            <!-- <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">{{ book.product_category }}</p> -->
+          </div>
+        </div>
+    
+        <!-- الأزرار -->
+        <button 
+        (click)="removeFromCart(book.products_id)"
+        class="w-auto bg-red-500 dark:bg-red-700 hover:bg-red-600 text-white py-2 px-4 rounded transition-colors">
+        إزالة من السلة
+      </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && cartBooks.length > 0" class="text-right mt-4">
+    <h2 class="text-xl font-bold dark:text-white">الإجمالي: {{ totalPrice }} ج.م</h2>
+    <button (click)="showCheckoutModal = true" class="mt-4 bg-green-500 dark:bg-green-700 hover:bg-green-600 text-white py-2 px-6 rounded-lg transition-colors">
+      إتمام الشراء
+    </button>
+  </div>
+</div>
+
+<app-checkout-modal 
+  *ngIf="showCheckoutModal"
+  (close)="showCheckoutModal = false">
+</app-checkout-modal>

@@ -1,0 +1,83 @@
+<!-- هذا المكان فقط يظهر عندما يكون هناك بحث -->
+<app-search-results *ngIf="isSearchPage"></app-search-results>
+<!-- زر التواصل -->
+<div [ngClass]="{'out':outOn,'on':!outOn}" class="z-50 w-auto h-auto grid items-center fixed -left-2 top-[60%] justify-end">
+    <div class="py-4 px-2 cursor-pointer rounded-full bg-[rgba(0,0,0,0.36)]">
+       <div class="flex">
+         <div (click)="outOn=!outOn" class="link bg-amber-800 rounded-full text-center w-8 h-8 absolute -right-3/4 top-1/2 flex place-items-center justify-center font-bold">
+            <fa-icon [ngClass]="{hidden:outOn}" class="text-white text-xs sm:mx-0" [icon]="faChevronRight"></fa-icon>
+            <fa-icon [ngClass]="{hidden:!outOn}" class="text-white text-xs sm:mx-0" [icon]="faChevronLeft"></fa-icon>
+         </div>
+           <div class="grid gap-5">
+             <div class="w-auto">
+               <a class="flex justify-center" target="_blank" href="https://www.facebook.com/profile.php?id=61566318152729&mibextid=ZbWKwL">
+                 <img class="w-6 h-6" src="face.png" alt="">
+               </a>
+             </div>
+             <div class="w-auto">
+               <a class="flex justify-center" target="_blank" href="https://t.me/kenouz123">
+                 <img class="w-6 h-6" src="telegram.png" alt="">
+               </a>
+             </div>
+             <div class="w-auto">
+               <a class="flex justify-center" target="_blank" href="https://chat.whatsapp.com/KGfq26vRKaW7sSN8gUQqYK">
+                 <img class="w-6 h-6" src="whats.png" alt="">
+               </a>
+             </div>
+             <div class="w-auto">
+               <a class="flex justify-center" target="_blank" href="https://www.instagram.com/maktabet_kenouz/profilecard/?igsh=c2h4ZTFhejljMGlo">
+                 <img class="w-6 h-6" src="insta.png" alt="">
+               </a>
+             </div>
+             <div class="w-auto">
+               <div (click)="copyPhoneNumber()" class="flex justify-center cursor-pointer select-none" aria-label="Copy phone number 01094612729" title="Copy phone number 01094612729">
+                 <span class="text-white text-xl">📞</span>
+               </div>
+             </div>
+           </div>
+       </div>
+    </div>
+  </div>
+
+<!-- التنقل بين الصفحات -->
+<app-navbar></app-navbar>
+
+<app-search-bar [allBooks]="allBooks" (searchExecuted)="onSearchExecuted($event)"></app-search-bar>
+
+<router-outlet></router-outlet>
+<!-- إضافة مكون الدردشة -->
+<app-chat-window></app-chat-window>
+<!-- Footer -->
+<footer class="bg-gray-800 text-white py-10 mt-a">
+  <div class="container mx-auto text-center">
+    <div class="mb-4">
+      <h2 class="text-2xl font-semibold">مكتبة كنوز</h2>
+      <p class="text-sm">اكتشف واشتري أفضل الكتب من مكتبتنا المتنوعة</p>
+    </div>
+
+    <div class="mb-4">
+      <!-- <ul class="flex justify-center space-x-8">
+        <li><a href="/عن-الموقع" class="hover:text-blue-400">عن الموقع</a></li>
+        <li><a href="/سياسة-الخصوصية" class="hover:text-blue-400">سياسة الخصوصية</a></li>
+        <li><a href="/الشروط-والاحكام" class="hover:text-blue-400">الشروط والأحكام</a></li>
+      </ul> -->
+    </div>
+
+    <div class="mt-4 text-sm text-yellow-400 flex items-center justify-center space-x-2">
+      <p>الموقع لا يتحمل مسؤولية حقوق الملكية الفكرية الخاصة بالكتب المعروضة، حيث يتم توفيرها من خلال موردين وشركاء متنوعين. نحن نعرض الكتب بغرض البيع فقط، وفي حال وجود أي انتهاك يرجى التواصل معنا لاتخاذ اللازم.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+/* Neon border effect for search input */
+.neon-border {
+  border-color: #0ff;
+  box-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.neon-border:focus {
+  box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 40px #0ff;
+}
+</style>

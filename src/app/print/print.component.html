@@ -1,0 +1,138 @@
+<div class="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-md pt-48">
+  <h6 class="text-sm text-center mb-6 text-yellow-600">العميل مسئول مسئولية تامة عن الملفات المطلوب طباعتها يحترم الموقع جميع حقوق النشر ونحفظها لأصحابها</h6>
+  <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">رفع مشاريع الطباعة</h2>
+  <button (click)="addProject()" class="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">إضافة مشروع جديد</button>
+  <form (submit)="submit(); $event.preventDefault()">
+    <div *ngFor="let project of projects; let i = index" class="mb-8 p-4 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
+      <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">المشروع {{ i + 1 }}</h3>
+      <label class="block mb-2 text-gray-700 dark:text-gray-300">
+        ملف PDF:
+        <input type="file" (change)="onFileChange($event, i)" accept="application/pdf" required
+          [ngClass]="{
+            'border-red-500': validationErrors[i]?.file,
+            'border-blue-500': !validationErrors[i]?.file && projects[i]?.file
+          }"
+          class="mt-1 block w-full text-sm text-gray-900 dark:text-gray-100 bg-gray-100 dark:bg-gray-700 border rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+          (change)="clearValidationError(i, 'file')" />
+      </label>
+      <label class="block mb-2 text-gray-700 dark:text-gray-300">
+        عنوان المشروع:
+        <input type="text" [(ngModel)]="project.projectTitle" name="projectTitle{{i}}" required
+          [ngClass]="{
+            'border-red-500': validationErrors[i]?.projectTitle,
+            'border-blue-500': !validationErrors[i]?.projectTitle && project.projectTitle?.trim() !== ''
+          }"
+          class="mt-1 block w-full rounded-md border bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 px-3 py-2"
+          (input)="clearValidationError(i, 'projectTitle')" />
+      </label>
+      <label class="block mb-2 text-gray-700 dark:text-gray-300">
+        حجم الكتاب:
+        <select [(ngModel)]="project.size" name="size{{i}}" required
+          [ngClass]="{
+            'border-red-500': validationErrors[i]?.size,
+            'border-blue-500': !validationErrors[i]?.size && project.size
+          }"
+          class="mt-1 block w-full rounded-md border bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 px-3 py-2"
+          (change)="clearValidationError(i, 'size')">
+          <option value="" disabled>اختر الحجم</option>
+          <option value="A4">A4 (29 * 21)</option>
+          <option value="A5">A5 (14 * 21)</option>
+          <option value="B5">B5 (17 * 24)</option>
+        </select>
+      </label>
+      <label class="block mb-2 text-gray-700 dark:text-gray-300">
+        نوع الغلاف:
+        <select [(ngModel)]="project.coverType" name="coverType{{i}}" required
+          [ngClass]="{
+            'border-red-500': validationErrors[i]?.coverType,
+            'border-blue-500': !validationErrors[i]?.coverType && project.coverType
+          }"
+          class="mt-1 block w-full rounded-md border bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 px-3 py-2"
+          (change)="clearValidationError(i, 'coverType')">
+          <option value="" disabled>اختر نوع الغلاف</option>
+          <option value="غلاف ورقي">غلاف ورقي</option>
+          <option value="غلاف كرتوني">غلاف كرتوني</option>
+          <option value="غلاف جلد فاخر">غلاف جلد فاخر</option>
+        </select>
+      </label>
+      <label class="block mb-2 text-gray-700 dark:text-gray-300">
+        لون الطباعة:
+        <select [(ngModel)]="project.printColor" name="printColor{{i}}" required
+          [ngClass]="{
+            'border-red-500': validationErrors[i]?.printColor,
+            'border-blue-500': !validationErrors[i]?.printColor && project.printColor
+          }"
+          class="mt-1 block w-full rounded-md border bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 px-3 py-2"
+          (change)="clearValidationError(i, 'printColor')">
+          <option value="" disabled>اختر لون الطباعة</option>
+          <option value="أبيض وأسود">أبيض وأسود</option>
+          <option value="ألوان">ألوان</option>
+        </select>
+      </label>
+      <label class="block mb-2 text-gray-700 dark:text-gray-300">
+        لون الورق:
+        <div class="flex items-center space-x-2">
+          <select [(ngModel)]="project.paperColor" name="paperColor{{i}}" required
+            [ngClass]="{
+              'border-red-500': validationErrors[i]?.paperColor,
+              'border-blue-500': !validationErrors[i]?.paperColor && project.paperColor
+            }"
+            class="mt-1 block rounded-md border bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 px-3 py-2"
+            (change)="clearValidationError(i, 'paperColor')">
+            <option value="#FFFFFF" selected>أبيض</option>
+            <option value="#DED5AF">أصفر</option>
+          </select>
+          <div [style.background-color]="project.paperColor" class="w-6 h-6 border border-gray-400 rounded ml-2"></div>
+        </div>
+      </label>
+      <label class="block mb-2 text-gray-700 dark:text-gray-300">
+        عدد الصفحات:
+        <input type="number" [(ngModel)]="project.pages" name="pages{{i}}" min="1" required
+          [ngClass]="{
+            'border-red-500': validationErrors[i]?.pages,
+            'border-blue-500': !validationErrors[i]?.pages && project.pages
+          }"
+          class="mt-1 block w-full rounded-md border bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 px-3 py-2"
+          (input)="clearValidationError(i, 'pages')" />
+      </label>
+      <label class="block mb-2 text-gray-700 dark:text-gray-300">
+        عدد النسخ المطلوبة:
+        <input type="number" [(ngModel)]="project.copies" name="copies{{i}}" min="1" required
+          [ngClass]="{
+            'border-red-500': validationErrors[i]?.copies,
+            'border-blue-500': !validationErrors[i]?.copies && project.copies
+          }"
+          class="mt-1 block w-full rounded-md border bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 px-3 py-2"
+          (input)="clearValidationError(i, 'copies')" />
+      </label>
+      <label class="block mb-4 text-gray-700 dark:text-gray-300">
+        ملاحظات إضافية:
+        <textarea [(ngModel)]="project.notes" name="notes{{i}}" rows="3"
+          class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 px-3 py-2"></textarea>
+      </label>
+      <button type="button" (click)="removeProject(i)"
+        class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition">حذف المشروع</button>
+    </div>
+    <div *ngIf="errorMessage" class="mb-4 text-red-600 font-semibold text-center">{{ errorMessage }}</div>
+    <button type="submit" [disabled]="uploading"
+      class="w-full py-3 bg-green-600 text-white rounded hover:bg-green-700 transition disabled:opacity-50">إرسال الطلب</button>
+  </form>
+
+  <div *ngIf="uploading" class="mt-4 text-blue-600 dark:text-blue-400 font-semibold">
+    جاري الرفع... {{ uploadProgress }}%
+    <div class="w-full bg-gray-200 rounded-full h-4 mt-2">
+      <div class="bg-blue-600 h-4 rounded-full" [style.width.%]="uploadProgress"></div>
+    </div>
+  </div>
+  <div *ngIf="uploadResponse" class="mt-4 p-4 bg-green-100 dark:bg-green-900 rounded text-green-800 dark:text-green-300">
+    <h3 class="text-lg font-bold mb-2">تم الرفع بنجاح</h3>
+    <p>عدد الملفات: {{ uploadResponse.numberOfFiles }}</p>
+    <p>السعر التقديري الإجمالي: {{ uploadResponse.totalEstimatedPrice }}</p>
+    <ul class="list-disc list-inside mt-2">
+      <li *ngFor="let project of uploadResponse.projects">
+        {{ project.projectTitle }} - السعر: {{ project.estimatedPrice }}
+      </li>
+    </ul>
+  </div>
+  <div *ngIf="errorMessage && !uploading" class="mt-4 text-red-600 dark:text-red-400 font-semibold">{{ errorMessage }}</div>
+</div>
