@@ -57,8 +57,8 @@
          <!-- صورة الكتاب -->
       <div [routerLink]="['/book', getBookSlug(book.product_name)]"
       class="relative w-full h-full bg-cover bg-center rounded-lg shadow-lg dark:shadow-black/50 hover:contrast-75 cursor-pointer overflow-hidden">
-      <img [routerLink]="['/book', getBookSlug(book.product_name)]"
-      [src]="'books/' + book.product_image + '.jpg'" 
+    <img [routerLink]="['/book', getBookSlug(book.product_name)]"
+      [src]="uploadsBaseUrl + '/' + book.product_image + '.jpg'" 
       (error)="handleImageError($event)"
       [alt]="book.product_name" 
       class="rounded-lg w-full h-[300px] cursor-pointer bg-cover"

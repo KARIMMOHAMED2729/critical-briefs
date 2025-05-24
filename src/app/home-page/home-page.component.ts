@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DataService } from '../services/data.service';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-home-page',
@@ -11,21 +12,22 @@ import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons
 export class HomePageComponent implements OnInit, OnDestroy {
   
   resetTimeouts: any[] = [];
+  uploadsBaseUrl = environment.uploadsBaseUrl;
 
   // Add getBookSlug method for use in template
   getBookSlug(bookName: string): string {
     return bookName.trim().replace(/\s+/g, '-');
   }
   categories = [
-    { id: 'Islamic', name: 'كتب دينية', image: 'islamic.png' },
-    { id: 'Self-development-psychology', name: 'تطوير الذات وعلم النفس', image: 'tatwer.webp' },
-    { id: 'Novels-stories', name: 'روايات وقصص', image: 'rewayat.jpg' },
-    { id: 'Business-Marketing-Finance', name: 'أعمال وتسويق ومالية', image: 'aamal.png' },
-    { id: 'HealthMedicineScience', name: 'صحة وطب وعلوم', image: 'fit.jpg' },
-    { id: 'Dictionaries-References', name: 'قواميس ومراجع', image: 'qamos.jpg' },
-    { id: 'Education-children', name: 'تربية وأطفال', image: 'child.jpg' },
-    { id: 'History-Biographies', name: 'تاريخ وسير ذاتية', image: 'tarekh.png' },
-    { id: 'Arts-crafts', name: 'فنون وحرف', image: 'fenon.jpg' }
+    { id: 'Islamic', name: 'كتب دينية', image: this.uploadsBaseUrl + '/islamic.png' },
+    { id: 'Self-development-psychology', name: 'تطوير الذات وعلم النفس', image: this.uploadsBaseUrl + '/tatwer.webp' },
+    { id: 'Novels-stories', name: 'روايات وقصص', image: this.uploadsBaseUrl + '/rewayat.jpg' },
+    { id: 'Business-Marketing-Finance', name: 'أعمال وتسويق ومالية', image: this.uploadsBaseUrl + '/aamal.png' },
+    { id: 'HealthMedicineScience', name: 'صحة وطب وعلوم', image: this.uploadsBaseUrl + '/fit.jpg' },
+    { id: 'Dictionaries-References', name: 'قواميس ومراجع', image: this.uploadsBaseUrl + '/qamos.jpg' },
+    { id: 'Education-children', name: 'تربية وأطفال', image: this.uploadsBaseUrl + '/child.jpg' },
+    { id: 'History-Biographies', name: 'تاريخ وسير ذاتية', image: this.uploadsBaseUrl + '/tarekh.png' },
+    { id: 'Arts-crafts', name: 'فنون وحرف', image: this.uploadsBaseUrl + '/fenon.jpg' }
   ];
 
   books: any[] = [];
@@ -235,16 +237,16 @@ export class HomePageComponent implements OnInit, OnDestroy {
 
     switch (imageElement.errorStep) {
       case 1:
-        imageElement.src = `books/${imageName}.webp`;
+        imageElement.src = this.uploadsBaseUrl + `/${imageName}.webp`;
         break;
       case 2:
-        imageElement.src = `books/${imageName}.png`;
+        imageElement.src = this.uploadsBaseUrl + `/${imageName}.png`;
         break;
       case 3:
-        imageElement.src = `books/${imageName}.jpg`;
+        imageElement.src = this.uploadsBaseUrl + `/${imageName}.jpg`;
         break;
       default:
-        imageElement.src = 'books/default.png';
+        imageElement.src = this.uploadsBaseUrl + '/default.png';
         break;
     }
   }
