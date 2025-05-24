@@ -13,6 +13,7 @@ export class PrintComponent {
   uploadResponse: any = null;
   uploading: boolean = false;
   uploadProgress: number = 0;
+  uploadSuccess: boolean = false;
   errorMessage: string = '';
 
   validationErrors: any[] = [];
@@ -146,6 +147,10 @@ export class PrintComponent {
         } else if (event.type === HttpEventType.Response) {
           this.uploadResponse = event.body;
           this.uploading = false;
+          this.uploadSuccess = true;
+          setTimeout(() => {
+            this.uploadSuccess = false;
+          }, 1000);
         }
       },
       error: (err) => {
@@ -154,4 +159,4 @@ export class PrintComponent {
       }
     });
   }
-}
+  }

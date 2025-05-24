@@ -6187,5 +6187,19 @@
     "product_price_before_discount": 59,
     "rival": true,
     "product_discount_percent": 55
+  },
+  {
+    "products_id": "505066600656",
+    "product_name": "ال40سشي",
+    "product_price": 29,
+    "price_cost": 0,
+    "product_quantity": 1,
+    "product_category": "تاريخ وسير ذاتية",
+    "product_description": "213",
+    "product_image": "505066600656",
+    "promotionEndDate": "2025-06-10T00:00:00.000Z",
+    "product_price_before_discount": 59,
+    "rival": true,
+    "product_discount_percent": 55
   }
 ]

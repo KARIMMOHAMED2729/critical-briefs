@@ -166,6 +166,22 @@
   </form>
 </div>
 
+<!-- Floating upload progress indicator -->
+<div *ngIf="uploading || uploadSuccess" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-80 max-w-full text-center shadow-lg">
+    <div *ngIf="uploading" class="text-blue-600 dark:text-blue-400 font-semibold">
+      جاري الرفع... {{ uploadProgress }}%
+      <div class="w-full bg-gray-200 rounded-full h-4 mt-2">
+        <div class="bg-blue-600 h-4 rounded-full transition-all duration-300 ease-in-out" [style.width.%]="uploadProgress"></div>
+      </div>
+    </div>
+    <div *ngIf="uploadSuccess" class="text-green-600 dark:text-green-400 font-semibold flex flex-col items-center space-y-2">
+      <fa-icon [icon]="['fas', 'check-circle']" class="text-6xl animate-scale-up"></fa-icon>
+      <div>تم الرفع بنجاح!</div>
+    </div>
+  </div>
+</div>
+
 <!-- عرض الطلبات -->
 <div *ngIf="currentView === 'orders'">
   <div class="px-2 sm:px-10">

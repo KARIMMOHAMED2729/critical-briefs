@@ -114,6 +114,10 @@ export class AdminDashboardComponent implements OnInit {
 
   imageError: string | null = null;
 
+  uploading: boolean = false;
+  uploadProgress: number = 0;
+  uploadSuccess: boolean = false;
+
   readonly MAX_IMAGE_SIZE_BYTES = 500 * 1024; // 500 KB
 
   categories: string[] = ['رواية', 'تنمية', 'ديني', 'قاموس', 'صحة', 'اعمال', 'فن', 'تاريخ', 'تربية'];
@@ -492,24 +496,44 @@ export class AdminDashboardComponent implements OnInit {
     formData.append('product_price', this.product.product_price.toString());
     formData.append('price_cost', this.product.price_cost.toString());
 
-    this.http.post(`${this.backendBaseUrl}/admin/add-product`, formData).subscribe({
-      next: (response) => {
-        alert('تم إضافة المنتج بنجاح.');
-        // Reset form
-        this.product = {
-          product_name: '',
-          product_quantity: 1,
-          product_category: '',
-          product_description: '',
-          product_price: 0,
-          price_cost: 0
-        };
-        this.selectedFile = null;
-        this.imageError = null;
-        // Optionally switch back to orders or another view
-        this.switchView('orders');
+    this.uploading = true;
+    this.uploadProgress = 0;
+    this.uploadSuccess = false;
+
+    this.http.request('POST', `${this.backendBaseUrl}/admin/add-product`, {
+      body: formData,
+      reportProgress: true,
+      observe: 'events'
+    }).subscribe({
+      next: (event) => {
+        if (event.type === 1 && event.total) { // HttpEventType.UploadProgress
+          this.uploadProgress = Math.round((event.loaded / event.total) * 100);
+        } else if (event.type === 4) { // HttpEventType.Response
+          this.uploadSuccess = true;
+          this.uploading = false;
+          // Removed alert for successful upload as requested
+          // Reset form
+          this.product = {
+            product_name: '',
+            product_quantity: 1,
+            product_category: '',
+            product_description: '',
+            product_price: 0,
+            price_cost: 0
+          };
+          this.selectedFile = null;
+          this.imageError = null;
+          this.switchView('orders');
+          setTimeout(() => {
+            this.uploadSuccess = false;
+            this.uploadProgress = 0;
+          }, 1000);
+        }
       },
       error: (error) => {
+        this.uploading = false;
+        this.uploadProgress = 0;
+        this.uploadSuccess = false;
         console.error('Error adding product:', error);
         alert('حدث خطأ أثناء إضافة المنتج.');
       }
