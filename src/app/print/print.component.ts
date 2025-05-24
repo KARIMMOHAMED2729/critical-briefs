@@ -29,7 +29,8 @@ export class PrintComponent {
       pages: null,
       copies: null,
       notes: '',
-      projectTitle: ''
+      projectTitle: '',
+      estimatedPrice: 0 // Add estimatedPrice property
     });
     this.validationErrors.push({});
   }
@@ -100,6 +101,56 @@ export class PrintComponent {
     return isValid;
   }
 
+  calculatePrice(project: any) {
+    // Updated price calculation logic to match backend
+    let basePricePerPage = 0.25; // base price per page in currency units
+    if (project.printColor === 'أبيض وأسود') {
+      basePricePerPage = 0.40;
+    } else if (project.printColor === 'ألوان') {
+      basePricePerPage = 0.90;
+    }
+
+    let coverPrice = 0;
+    if (project.coverType === 'غلاف ورقي') {
+      coverPrice = 25;
+    } else if (project.coverType === 'غلاف كرتوني') {
+      coverPrice = 60;
+    } else if (project.coverType === 'غلاف جلد فاخر') {
+      coverPrice = 100;
+    }
+
+    let sizeMultiplier = 1;
+    if (project.size === 'A4') {
+      sizeMultiplier = 1;
+    } else if (project.size === 'A5') {
+      sizeMultiplier = 0.8;
+    } else if (project.size === 'B5') {
+      sizeMultiplier = 0.95;
+    }
+
+    let paperColorPrice = 0;
+    if (project.paperColor === '#DED5AF') { // yellow paper
+      paperColorPrice = 0.10;
+    } else if (project.paperColor === '#FFFFFF') { // white paper default
+      paperColorPrice = 0;
+    }
+
+    const pages = project.pages || 0;
+    const copies = project.copies || 0;
+
+    const price = ((pages * basePricePerPage) + coverPrice + paperColorPrice) * copies * sizeMultiplier;
+    return Math.round(price * 100) / 100; // round to 2 decimals
+  }
+
+  updateEstimatedPrice(index: number) {
+    const project = this.projects[index];
+    project.estimatedPrice = this.calculatePrice(project);
+  }
+
+  onProjectChange(index: number) {
+    this.updateEstimatedPrice(index);
+  }
+
   submit() {
     if (this.projects.length === 0) {
       alert('أدخل مشروع الطباعة أولا');
@@ -159,4 +210,4 @@ export class PrintComponent {
       }
     });
   }
-  }
+}

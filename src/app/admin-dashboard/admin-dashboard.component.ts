@@ -118,7 +118,7 @@ export class AdminDashboardComponent implements OnInit {
   uploadProgress: number = 0;
   uploadSuccess: boolean = false;
 
-  readonly MAX_IMAGE_SIZE_BYTES = 500 * 1024; // 500 KB
+readonly MAX_IMAGE_SIZE_BYTES = 1024 * 1024; // 1 MB
 
   categories: string[] = ['رواية', 'تنمية', 'ديني', 'قاموس', 'صحة', 'اعمال', 'فن', 'تاريخ', 'تربية'];
 
@@ -457,7 +457,7 @@ export class AdminDashboardComponent implements OnInit {
         this.imageError = 'يرجى تحميل ملف صورة صالح (JPEG, PNG, GIF, WEBP, BMP, SVG).';
         this.selectedFile = null;
       } else if (file.size > this.MAX_IMAGE_SIZE_BYTES) {
-        this.imageError = `حجم الصورة أكبر من 500 كيلوبايت. يرجى تحميل صورة أصغر.`;
+this.imageError = `حجم الصورة أكبر من 1 ميجابايت. يرجى تحميل صورة أصغر.`;
         this.selectedFile = null;
       } else {
         this.selectedFile = file;

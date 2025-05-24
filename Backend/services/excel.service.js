@@ -204,14 +204,14 @@ async function addProductToExcel(productData) {
     const wbout = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 
     // Save updated Excel file locally (optional)
-    fs.writeFileSync('updated_products.xlsx', wbout);
+    // fs.writeFileSync('updated_products.xlsx', wbout); // Disabled for security reasons
 
     // Upload updated Excel file back to Google Drive
     await drive.files.update({
       fileId,
       media: {
         mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        body: fs.createReadStream('updated_products.xlsx')
+        body: wbout // Upload directly from buffer without saving locally
       }
     });
 

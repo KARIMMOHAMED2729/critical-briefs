@@ -3,6 +3,7 @@ const fs = require('fs');
 const multer = require('multer');
 const sharp = require('sharp');
 const { addProductToExcel, categoryMap } = require('../services/excel.service');
+const { generateSitemap } = require('../services/sitemap.service');
 
 // Helper function to generate random barcode string
 function generateRandomBarcode(length = 12) {
@@ -14,10 +15,9 @@ function generateRandomBarcode(length = 12) {
   return result;
 }
 
-// Multer setup for image upload with memory storage and file size limit 200 KB
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 500 * 1024 }, // 500 KB
+  limits: { fileSize: 1024 * 1024 }, // 1 MB
   fileFilter: (req, file, cb) => {
     // Accept only image files
     if (!file.mimetype.startsWith('image/')) {
@@ -95,11 +95,14 @@ async function addProduct(req, res) {
     // Call service to add product to Excel
     await addProductToExcel(productData);
 
+    // Update sitemap.xml after product addition
+    await generateSitemap();
+
     res.json({ success: true, message: 'Product added successfully', barcode });
   } catch (error) {
     console.error('Error in addProduct:', error);
     if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ success: false, message: 'Image file size exceeds 200 KB limit' });
+      return res.status(400).json({ success: false, message: 'Image file size exceeds 1 MB limit' });
     }
     res.status(500).json({ success: false, message: 'Server error' });
   }

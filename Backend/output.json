@@ -6173,33 +6173,5 @@
     "product_price_before_discount": 419,
     "rival": true,
     "product_discount_percent": 65
-  },
-  {
-    "products_id": "606023751912",
-    "product_name": "قصث",
-    "product_price": 39,
-    "price_cost": 2,
-    "product_quantity": 1,
-    "product_category": "فنون وحرف",
-    "product_description": "صثق",
-    "product_image": "606023751912",
-    "promotionEndDate": "2025-06-10T00:00:00.000Z",
-    "product_price_before_discount": 89,
-    "rival": true,
-    "product_discount_percent": 60
-  },
-  {
-    "products_id": "420524925421",
-    "product_name": "wrewre",
-    "product_price": 239,
-    "price_cost": 3,
-    "product_quantity": 1,
-    "product_category": "روايات وقصص",
-    "product_description": "wer",
-    "product_image": "420524925421",
-    "promotionEndDate": "2025-06-10T00:00:00.000Z",
-    "product_price_before_discount": 639,
-    "rival": true,
-    "product_discount_percent": 65
   }
 ]
