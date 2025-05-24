@@ -8,7 +8,7 @@
           {{ book.product_discount_percent }}% خصم
         </div>
         <div class="relative inline-block">
-          <img [src]="getImageUrl(book.product_image)" alt="{{ book.product_name }}" (error)="handleImageError($event)" class="w-64 h-auto mb-4 mx-auto rounded-lg shadow-md dark:shadow-lg" />
+<img [src]="uploadsBaseUrl + '/' + book.product_image + '.jpg'" alt="{{ book.product_name }}" (error)="handleImageError($event)" class="w-64 h-auto mb-4 mx-auto rounded-lg shadow-md dark:shadow-lg" />
           <button (click)="copyBookLink()" title="نسخ رابط الكتاب" class="absolute top-2 right-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-full p-2 shadow-md dark:shadow-lg">
             <fa-icon [icon]="faShareAlt" class="text-gray-700 dark:text-gray-300 h-5 w-5"></fa-icon>
           </button>

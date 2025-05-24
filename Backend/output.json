@@ -6173,5 +6173,19 @@
     "product_price_before_discount": 419,
     "rival": true,
     "product_discount_percent": 65
+  },
+  {
+    "products_id": "841321392211",
+    "product_name": "كلام للبنات - الخطوبة وأحلام البنات",
+    "product_price": 59,
+    "price_cost": 20,
+    "product_quantity": 1,
+    "product_category": "تطوير الذات وعلم النفس",
+    "product_description": "تعنى انها تخطت مرحلة الطفولة واجتازت مرحلة المراهقة إلى مرحلة الزواج وتكوين عش الزوجيه .. تعنى ان هناك من يراها هى وحدها فقط فى هذا الكون .. يحبها .. يتمنى ان يكمل معها ما بقى من حياتها..",
+    "product_image": "841321392211",
+    "promotionEndDate": "2025-06-10T00:00:00.000Z",
+    "product_price_before_discount": 169,
+    "rival": true,
+    "product_discount_percent": 70
   }
 ]

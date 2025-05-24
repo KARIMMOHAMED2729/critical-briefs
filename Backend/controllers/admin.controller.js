@@ -45,7 +45,7 @@ async function addProduct(req, res) {
 
     // Compress and save image using sharp
     const filename = barcode + '.webp';
-    const uploadDir = path.join(__dirname, '../../Backend/dist/browser/books');
+    const uploadDir = path.join(__dirname, '../uploads/books');
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }

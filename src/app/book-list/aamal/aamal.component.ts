@@ -7,6 +7,7 @@ import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import { AuthService } from '../../auth/auth.service';
 import { AccountModalComponent } from '../../auth/account-modal/account-modal.component';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
 selector: 'app-aamal',
@@ -15,8 +16,8 @@ templateUrl: './aamal.component.html',
 styleUrls: ['./aamal.component.css']
 })
 export class AamalComponent implements OnInit, OnDestroy {
+  uploadsBaseUrl = environment.uploadsBaseUrl;
   @ViewChild(AccountModalComponent, { static: false }) accountModal?: AccountModalComponent;
-
   faHeart = faHeart;
   faCartPlus = faCartPlus;
   faStar = faStar;
@@ -271,19 +272,19 @@ if (!imageElement.errorStep) {
 const imageName = imageElement.src.split('/').pop().split('.')[0];
 
 switch (imageElement.errorStep) {
-  case 1:
-    imageElement.src = `books/${imageName}.webp`;
-    break;
-  case 2:
-    imageElement.src = `books/${imageName}.png`;
-    break;
-  case 3:
-    imageElement.src = `books/${imageName}.jpg`;
-    break;
-  default:
-    imageElement.src = 'books/default.png'; // صورة افتراضية
-    break;
-}
+      case 1:
+        imageElement.src = this.uploadsBaseUrl + `/${imageName}.webp`;
+        break;
+      case 2:
+        imageElement.src = this.uploadsBaseUrl + `/${imageName}.png`;
+        break;
+      case 3:
+        imageElement.src = this.uploadsBaseUrl + `/${imageName}.jpg`;
+        break;
+      default:
+        imageElement.src = this.uploadsBaseUrl + '/default.png';
+        break;
+    }
 }
 
 startCountdown() {

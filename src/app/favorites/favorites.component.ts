@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
 import { DataService } from '../services/data.service';
 import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-favorites',
@@ -10,6 +11,7 @@ import { map } from 'rxjs/operators';
   styleUrls: ['./favorites.component.css']
 })
 export class FavoritesComponent implements OnInit {
+  uploadsBaseUrl = environment.uploadsBaseUrl;
   favoriteBooks: any[] = [];
   isLoading = true;
   showLoginPrompt = false;
@@ -120,18 +122,18 @@ export class FavoritesComponent implements OnInit {
   
     const imageName = imageElement.src.split('/').pop().split('.')[0];
   
-    switch (imageElement.errorStep) {
+switch (imageElement.errorStep) {
       case 1:
-        imageElement.src = `books/${imageName}.webp`;
+        imageElement.src = this.uploadsBaseUrl + `/${imageName}.webp`;
         break;
       case 2:
-        imageElement.src = `books/${imageName}.png`;
+        imageElement.src = this.uploadsBaseUrl + `/${imageName}.png`;
         break;
       case 3:
-        imageElement.src = `books/${imageName}.jpg`;
+        imageElement.src = this.uploadsBaseUrl + `/${imageName}.jpg`;
         break;
       default:
-        imageElement.src = 'books/default.png';
+        imageElement.src = this.uploadsBaseUrl + '/default.png';
         break;
     }
   }

@@ -3,6 +3,7 @@ import { DataService } from '../services/data.service';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { environment } from '../../environments/environment';
 
+
 @Component({
   selector: 'app-home-page',
   standalone: false,

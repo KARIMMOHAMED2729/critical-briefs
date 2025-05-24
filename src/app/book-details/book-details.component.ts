@@ -11,6 +11,7 @@ import { HttpClient } from '@angular/common/http';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faStar, faShareAlt } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-book-details',
@@ -20,8 +21,8 @@ import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
   styleUrls: ['./book-details.component.css']
 })
 export class BookDetailsComponent implements OnInit {
+  uploadsBaseUrl = environment.uploadsBaseUrl;
   @ViewChild(AccountModalComponent, { static: false }) accountModal?: AccountModalComponent;
-
   faStar = faStar;
   faStarRegular = faStarRegular;
   faShareAlt = faShareAlt;
@@ -130,16 +131,16 @@ export class BookDetailsComponent implements OnInit {
 
     switch (imageElement.errorStep) {
       case 1:
-        imageElement.src = `books/${imageName}.webp`;
+        imageElement.src = this.uploadsBaseUrl + `/${imageName}.webp`;
         break;
       case 2:
-        imageElement.src = `books/${imageName}.png`;
+        imageElement.src = this.uploadsBaseUrl + `/${imageName}.png`;
         break;
       case 3:
-        imageElement.src = `books/${imageName}.jpg`;
+        imageElement.src = this.uploadsBaseUrl + `/${imageName}.jpg`;
         break;
       default:
-        imageElement.src = 'books/default.png'; // صورة افتراضية
+        imageElement.src = this.uploadsBaseUrl + '/default.png';
         break;
     }
   }
