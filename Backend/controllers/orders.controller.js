@@ -134,6 +134,11 @@ exports.updateOrderStatus = async (req, res) => {
 
     order.status = status;
 
+    // Clear paymentSessionUrl if order is cancelled or completed
+    if (status === 'تم الإلغاء' || status === 'تم التسليم') {
+      order.paymentSessionUrl = null;
+    }
+
     // Create notification message based on status
     let notificationMessage = '';
     switch (status) {

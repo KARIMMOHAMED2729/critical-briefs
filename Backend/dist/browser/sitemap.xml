@@ -2888,4 +2888,16 @@
           <priority>0.8</priority>
         </url>
       
+        <url>
+          <loc>http://localhost:3000/book/توقف-عن-ارضاء-الآخرين</loc>
+          <changefreq>weekly</changefreq>
+          <priority>0.8</priority>
+        </url>
+      
+        <url>
+          <loc>http://localhost:3000/book/الداء-والدواء---الجواب-الكافي-لمن-سأل-عن-الدواء-الشافي</loc>
+          <changefreq>weekly</changefreq>
+          <priority>0.8</priority>
+        </url>
+      
 </urlset>

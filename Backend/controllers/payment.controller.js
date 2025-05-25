@@ -4,6 +4,23 @@ exports.createPaymentSession = async (req, res) => {
     try {
         const { amount, currency, orderId, customerEmail, merchantRedirect } = req.body;
 
+        // Find user and order by orderId
+        const User = require('../models/User.model');
+        const user = await User.findOne({ 'orders._id': orderId });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found for this order' });
+        }
+        const order = user.orders.id(orderId);
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        // Check if payment session URL already exists
+        if (order.paymentSessionUrl) {
+            return res.status(200).json({ sessionUrl: order.paymentSessionUrl });
+        }
+
+        // Create new payment session
         const response = await axios.post(
             'https://api.kashier.io/v3/payment/sessions',
             {
@@ -33,6 +50,10 @@ exports.createPaymentSession = async (req, res) => {
                 },
             }
         );
+
+        // Save payment session URL in order
+        order.paymentSessionUrl = response.data.sessionUrl;
+        await user.save();
 
         res.status(200).json({
             sessionUrl: response.data.sessionUrl,

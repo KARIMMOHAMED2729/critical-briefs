@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema({
     }],
     shippingCost:Number,
     totalAmount: Number,
+    paymentSessionUrl: { type: String, default: null },
     status: { type: String, default: 'قيد الإنتظار' }, // pending, shipped, completed,cancelled
     shippingAddress: {
       governorate: String,

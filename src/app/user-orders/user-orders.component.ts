@@ -212,41 +212,18 @@ export class UserOrdersComponent implements OnInit {
 
     this.authService.user$.pipe(take(1)).subscribe(user => {
       const customerEmail = user?.email || '';
-      // Prepare order data for re-submission
-      const orderData = {
-        userId: this.userId,
-        products: order.products.map(p => ({
-          bookId: p.bookId || '',
-          bookName: p.book,
-          quantity: p.quantity,
-          price: 0 // Price is not used in backend order creation, so set to 0 or remove if not needed
-        })),
-        shippingCost: 0, // Shipping cost unknown here, set to 0 or adjust as needed
-        totalAmount: order.totalAmount
-      };
-      // Re-submit order to get new orderId
-      this.http.post<{ orderId: string }>(`${environment.apiBaseUrl}/orders/submit`, orderData).subscribe({
-        next: (response) => {
-          const newOrderId = response.orderId;
-          console.log('New orderId from re-submission:', newOrderId);
-      // Removed debug alert for cleaner user experience
-          this.paymentService.createPayment(newOrderId, order.totalAmount, currency, customerEmail, merchantRedirect).subscribe({
-            next: (paymentResponse: any) => {
-              if (paymentResponse.sessionUrl) {
-                window.location.href = paymentResponse.sessionUrl;
-              } else {
-                alert('فشل في الحصول على رابط الدفع');
-              }
-            },
-            error: (paymentError) => {
-              console.error('خطأ في إنشاء طلب الدفع:', paymentError);
-              alert('حدث خطأ أثناء إنشاء طلب الدفع، يرجى المحاولة مرة أخرى');
-            }
-          });
+      // Use existing order ID to create payment session without re-submitting order
+      this.paymentService.createPayment(order._id, order.totalAmount, currency, customerEmail, merchantRedirect).subscribe({
+        next: (paymentResponse: any) => {
+          if (paymentResponse.sessionUrl) {
+            window.location.href = paymentResponse.sessionUrl;
+          } else {
+            alert('فشل في الحصول على رابط الدفع');
+          }
         },
-        error: (err) => {
-          console.error('Error re-submitting order:', err);
-          alert('حدث خطأ أثناء إعادة إرسال الطلب، يرجى المحاولة مرة أخرى');
+        error: (paymentError) => {
+          console.error('خطأ في إنشاء طلب الدفع:', paymentError);
+          alert('حدث خطأ أثناء إنشاء طلب الدفع، يرجى المحاولة مرة أخرى');
         }
       });
     });

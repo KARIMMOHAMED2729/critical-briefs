@@ -6187,5 +6187,33 @@
     "product_price_before_discount": 169,
     "rival": true,
     "product_discount_percent": 70
+  },
+  {
+    "products_id": "777388808113",
+    "product_name": "توقف عن ارضاء الآخرين",
+    "product_price": 69,
+    "price_cost": 40,
+    "product_quantity": 1,
+    "product_category": "تطوير الذات وعلم النفس",
+    "product_description": "دليل عملي ومتعاطف يهدف إلى مساعدة القارئ على كسر أنماط إرضاء الآخرين التي قد تضر بمساره المهني وعلاقاته وصحته النفسية",
+    "product_image": "777388808113",
+    "promotionEndDate": "2025-06-10T00:00:00.000Z",
+    "product_price_before_discount": 199,
+    "rival": true,
+    "product_discount_percent": 70
+  },
+  {
+    "products_id": "870334968839",
+    "product_name": "الداء والدواء - الجواب الكافي لمن سأل عن الدواء الشافي",
+    "product_price": 179,
+    "price_cost": 120,
+    "product_quantity": 1,
+    "product_category": "كتب دينية",
+    "product_description": "كتاب مهم في مجال علم النفس الإسلامي، حيث يتناول إصلاح النفس وتقويمها بالنظر إلى المنظور الإسلامي",
+    "product_image": "870334968839",
+    "promotionEndDate": "2025-06-10T00:00:00.000Z",
+    "product_price_before_discount": 499,
+    "rival": true,
+    "product_discount_percent": 65
   }
 ]

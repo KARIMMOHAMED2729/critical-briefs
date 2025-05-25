@@ -69,10 +69,8 @@ app.get('/uploads/:filename', (req, res) => {
       contentType = 'application/zip';
     }
     res.setHeader('Content-Type', contentType);
-    // Force download by setting Content-Disposition to attachment
-    // Use encodeURIComponent to encode filename in Content-Disposition header
-    const encodedFilenameHeader = encodeURIComponent(filename);
-    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodedFilenameHeader}`);
+    // Remove Content-Disposition header to allow inline display
+    // res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`);
     res.sendFile(filePath, (err) => {
       if (err) {
         console.error('Error sending file for download:', err);
@@ -82,8 +80,8 @@ app.get('/uploads/:filename', (req, res) => {
   });
 });
 
-// Serve uploads directory as static files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+const uploadsAbsolutePath = require('path').resolve(__dirname, 'uploads');
+app.use('/uploads', express.static(uploadsAbsolutePath));
 
 // الاتصال بقاعدة البيانات
 connectDB().catch(err => {
@@ -246,8 +244,12 @@ app.get('/sitemap.xml', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist/browser/sitemap.xml'));
 });
 
-// أي مسار غير معروف يرجع index.html (لدعم Angular Routing)
-app.get('*', (req, res) => {
+// تعديل مسار catch-all لتجاهل طلبات /uploads/ وتوجيهها إلى Nginx مباشرة
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/uploads/')) {
+    // تجاهل هذا الطلب ليتم التعامل معه من قبل Nginx
+    return next();
+  }
   res.sendFile(path.join(__dirname, 'dist/browser/index.html'));
 });
 
