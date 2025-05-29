@@ -219,9 +219,9 @@ export class HomePageComponent implements OnInit, OnDestroy {
   setPromoImages(): void {
     const width = window.innerWidth;
     if (width < 640) {
-      this.promoImages = ['smpanar1.jpg', 'smpanar2.jpg'];
+      this.promoImages = ['smpanar1.jpg', 'smpanar2.jpg','smpanar3.jpg'];
     } else {
-      this.promoImages = ['panar1.jpg', 'panar2.jpg'];
+      this.promoImages = ['panar1.jpg', 'panar4.jpg','panar3.jpg'];
     }
   }
 
