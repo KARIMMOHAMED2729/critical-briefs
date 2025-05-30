@@ -246,7 +246,7 @@ async function uploadExcelFromJson(createCopy = false) {
     xlsx.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
     // Write workbook to buffer
-    const wbout = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    const wbout = xlsx.write(workbook, { type: 'buffer', bookType: 'xls' });
 
     const client = await auth.getClient();
     const drive = google.drive({ version: 'v3', auth: client });
@@ -254,11 +254,11 @@ async function uploadExcelFromJson(createCopy = false) {
     if (createCopy) {
       // Create a new file on Google Drive as a copy
       const fileMetadata = {
-        name: `Copy_of_output_${Date.now()}.xlsx`,
-        mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        name: `Copy_of_output_${Date.now()}.xls`,
+        mimeType: 'application/vnd.ms-excel'
       };
       const media = {
-        mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        mimeType: 'application/vnd.ms-excel',
         body: wbout
       };
       const response = await drive.files.create({
@@ -273,11 +273,11 @@ async function uploadExcelFromJson(createCopy = false) {
       await drive.files.update({
         fileId,
         media: {
-          mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          mimeType: 'application/vnd.ms-excel',
           body: wbout
         }
       });
-      console.log('✅ Excel file uploaded from output.json to Google Drive.');
+      console.log('✅ Excel file (xls) uploaded from output.json to Google Drive.');
       return true;
     }
   } catch (error) {

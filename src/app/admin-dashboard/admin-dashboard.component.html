@@ -1,19 +1,19 @@
 <h2 class="text-3xl font-extrabold mb-6 pt-40 text-center text-blue-700 dark:text-blue-400">لوحة تحكم الأدمن</h2>
 
-<div class="flex justify-center space-x-4 mb-6">
-  <button (click)="switchView('orders')" [class.bg-blue-600]="currentView === 'orders'" class="px-4 py-2 rounded text-white bg-blue-400 hover:bg-blue-600  transition">
+<div class="flex flex-wrap justify-center gap-4 mb-6">
+  <button (click)="switchView('orders')" [class.bg-blue-600]="currentView === 'orders'" class="px-4 py-2 rounded text-white bg-blue-400 hover:bg-blue-600 transition">
     الطلبات
   </button>
-  <button (click)="switchView('requestedBooks')" [class.bg-blue-600]="currentView === 'requestedBooks'" class="px-4 py-2 rounded text-white bg-blue-400 hover:bg-blue-600  transition">
+  <button (click)="switchView('requestedBooks')" [class.bg-blue-600]="currentView === 'requestedBooks'" class="px-4 py-2 rounded text-white bg-blue-400 hover:bg-blue-600 transition">
     اقتراحات الكتب
   </button>
-  <button (click)="switchView('printOrders')" [class.bg-blue-600]="currentView === 'printOrders'" class="px-4 py-2 rounded text-white bg-blue-400 hover:bg-blue-600  transition">
+  <button (click)="switchView('printOrders')" [class.bg-blue-600]="currentView === 'printOrders'" class="px-4 py-2 rounded text-white bg-blue-400 hover:bg-blue-600 transition">
     طلبات الطباعة
   </button>
-  <button (click)="switchView('addProduct')" [class.bg-blue-600]="currentView === 'addProduct'" class="px-4 py-2 rounded text-white bg-blue-400 hover:bg-blue-600  transition">
+  <button (click)="switchView('addProduct')" [class.bg-blue-600]="currentView === 'addProduct'" class="px-4 py-2 rounded text-white bg-blue-400 hover:bg-blue-600 transition">
     إضافة منتج جديد
   </button>
-  <button (click)="switchView('products')" [class.bg-blue-600]="currentView === 'products'" class="px-4 py-2 rounded text-white bg-blue-400 hover:bg-blue-600  transition">
+  <button (click)="switchView('products')" [class.bg-blue-600]="currentView === 'products'" class="px-4 py-2 rounded text-white bg-blue-400 hover:bg-blue-600 transition">
     عرض وتعديل المنتجات
   </button>
 </div>
