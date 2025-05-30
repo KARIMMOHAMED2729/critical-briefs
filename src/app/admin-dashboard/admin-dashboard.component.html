@@ -172,6 +172,14 @@
 <div *ngIf="currentView === 'products'" class="px-4 sm:px-10 max-w-6xl mx-auto">
   <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-gray-200">عرض وتعديل المنتجات</h3>
   <!-- Search bar for filtering products -->
+  <div class="mb-4 flex justify-between items-center">
+    <button
+      (click)="saveAllProducts()"
+      class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-2"
+    >
+      حفظ الكل
+    </button>
+  </div>
   <div class="mb-4">
     <input
       type="text"
@@ -182,7 +190,7 @@
     />
   </div>
   <div class="overflow-x-auto">
-    <table class="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md text-sm mx-auto">
+    <table class="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md text-sm mx-auto hidden sm:table">
       <thead>
         <tr class="bg-blue-100 dark:bg-[#0a1325] text-blue-700 dark:text-blue-400 uppercase text-xs font-semibold">
           <th class="py-3 px-4 text-center border-b border-blue-200 dark:border-blue-700">صورة المنتج</th>
@@ -199,7 +207,7 @@
       <tbody *ngIf="products.length > 0">
         <tr *ngFor="let product of products; let i = index" [ngClass]="{'bg-blue-50 dark:bg-[#0a1325]': i % 2 === 0, 'bg-white dark:bg-gray-800': i % 2 !== 0}">
           <td class="py-2 px-3 text-center border-b border-blue-200 dark:border-blue-700">
-<img *ngIf="product.product_image" [src]="uploadsBaseUrl + '/' + product.product_image" alt="صورة المنتج" class="w-16 h-16 object-cover mx-auto rounded" (error)="handleImageError($event)" />
+            <img *ngIf="product.product_image" [src]="uploadsBaseUrl + '/' + product.product_image" alt="صورة المنتج" class="w-16 h-16 object-cover mx-auto rounded" (error)="handleImageError($event)" />
             <span *ngIf="!product.product_image">لا توجد صورة</span>
           </td>
           <td class="py-2 px-3 text-center border-b border-blue-200 dark:border-blue-700">
@@ -235,10 +243,58 @@
           </td>
         </tr>
       </tbody>
-      <p *ngIf="products.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-6">لا توجد منتجات حالياً</p>
     </table>
   </div>
 
+  <!-- Responsive grid layout for small screens -->
+  <div *ngIf="products.length > 0" class="sm:hidden flex flex-col gap-4 max-w-md mx-auto">
+    <div *ngFor="let product of products" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-3">
+      <div class="flex justify-center">
+        <img *ngIf="product.product_image" [src]="uploadsBaseUrl + '/' + product.product_image" alt="صورة المنتج" class="w-16 h-16 object-cover rounded" (error)="handleImageError($event)" />
+        <span *ngIf="!product.product_image" class="text-gray-500 dark:text-gray-400">لا توجد صورة</span>
+      </div>
+      <div>
+        <label class="block font-semibold mb-1">اسم المنتج</label>
+        <input [(ngModel)]="product.product_name" class="w-full border rounded px-2 py-1 dark:bg-gray-700 dark:text-gray-200" />
+      </div>
+      <div>
+        <label class="block font-semibold mb-1">الكمية</label>
+        <input type="number" [(ngModel)]="product.product_quantity" min="0" class="w-full border rounded px-2 py-1 dark:bg-gray-700 dark:text-gray-200" />
+      </div>
+      <div>
+        <label class="block font-semibold mb-1">الفئة</label>
+        <select [(ngModel)]="product.product_category" class="w-full border rounded px-2 py-1 dark:bg-gray-700 dark:text-gray-200">
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+      <div>
+        <label class="block font-semibold mb-1">الوصف</label>
+        <textarea [(ngModel)]="product.product_description" rows="2" class="w-full border rounded px-2 py-1 dark:bg-gray-700 dark:text-gray-200"></textarea>
+      </div>
+      <div>
+        <label class="block font-semibold mb-1">سعر البيع</label>
+        <input type="number" [(ngModel)]="product.product_price" min="0" step="0.01" class="w-full border rounded px-2 py-1 dark:bg-gray-700 dark:text-gray-200" />
+      </div>
+      <div>
+        <label class="block font-semibold mb-1">سعر الشراء</label>
+        <input type="number" [(ngModel)]="product.price_cost" min="0" step="0.01" class="w-full border rounded px-2 py-1 dark:bg-gray-700 dark:text-gray-200" />
+      </div>
+      <div>
+        <label class="block font-semibold mb-1">تعديل الصورة</label>
+        <input type="file" (change)="replaceProductImage(product, $any($event.target).files ? $any($event.target).files[0] : null)" accept="image/*" class="w-full" />
+      </div>
+      <div class="flex space-x-2 rtl">
+        <button (click)="updateProduct(product)" [disabled]="!hasProductChanged(product)" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-3 rounded disabled:opacity-50">
+          حفظ
+        </button>
+        <button (click)="deleteProduct(product)" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded">
+          حذف
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <p *ngIf="products.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-6">لا توجد منتجات حالياً</p>
   <!-- Pagination controls for products -->
   <div class="flex justify-center mt-4 space-x-4 items-center">
     <button (click)="prevProductsPage()" [disabled]="productsPage === 1" class="px-3 py-1 bg-gray-300 dark:bg-gray-600 rounded disabled:opacity-50">السابق</button>

@@ -253,6 +253,34 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
+  saveAllProducts(): void {
+    const changedProducts = this.allProducts.filter(p => this.hasProductChanged(p));
+    if (changedProducts.length === 0) {
+      alert('لا توجد تغييرات لحفظها.');
+      return;
+    }
+    const updatePayload = { products: changedProducts.map(p => ({
+      products_id: p.products_id,
+      product_name: p.product_name,
+      product_quantity: p.product_quantity,
+      product_category: p.product_category,
+      product_description: p.product_description,
+      product_price: p.product_price,
+      price_cost: p.price_cost
+    }))};
+
+    this.http.post(`${this.backendBaseUrl}/admin/products/batch-update`, updatePayload).subscribe({
+      next: () => {
+        alert('تم حفظ جميع التغييرات بنجاح');
+        this.loadProducts();
+      },
+      error: (err) => {
+        console.error('Error batch updating products:', err);
+        alert('حدث خطأ أثناء حفظ التغييرات');
+      }
+    });
+  }
+
   hasProductChanged(product: Product): boolean {
     const original = this.originalProducts.find(p => p.products_id === product.products_id);
     if (!original) return true;

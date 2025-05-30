@@ -20,4 +20,7 @@ router.delete('/products/:barcode', adminController.deleteProduct);
 // Route to sync output.json to Excel and upload to Google Drive
 router.post('/sync-json-to-excel', adminController.syncJsonToExcel);
 
+// New route for batch update products
+router.post('/products/batch-update', adminController.batchUpdateProducts);
+
 module.exports = router;
