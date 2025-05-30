@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEventType } from '@angular/common/http';
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
 import { DataService } from '../services/data.service';
 import { take } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { NotificationService } from '../services/notification.service';
+import * as XLSX from 'xlsx';
 
 interface Order {
   _id: string;
@@ -31,8 +32,22 @@ interface RequestedBook {
 }
 
 interface Product {
-  book: string;
-  quantity: number;
+  products_id: string;
+  product_name: string;
+  product_quantity: number;
+  product_category: string;
+  product_description: string;
+  product_price: number;
+  price_cost: number;
+  product_image?: string;
+  promotionEndDate?: string;
+  product_price_before_discount?: number;
+  product_discount_percent?: number;
+}
+
+interface OrderProduct {
+  product_name: string;
+  product_quantity: number;
 }
 
 interface GroupedOrder {
@@ -41,7 +56,7 @@ interface GroupedOrder {
   email: string;
   phone: string;
   address: string;
-  products: Product[];
+  products: OrderProduct[];
   status: string;
   orderDate: string;
   totalAmount: number;
@@ -83,7 +98,7 @@ export class AdminDashboardComponent implements OnInit {
   orders: GroupedOrder[] = [];
   requestedBooks: RequestedBook[] = [];
   isAdmin: boolean = false;
-  currentView: 'orders' | 'requestedBooks' | 'printOrders' | 'addProduct' = 'orders';
+  currentView: 'orders' | 'requestedBooks' | 'printOrders' | 'addProduct' | 'products' = 'orders';
 
   // Pagination state for orders
   ordersPage: number = 1;
@@ -99,7 +114,15 @@ export class AdminDashboardComponent implements OnInit {
 
   printOrders: PrintOrder[] = [];
 
+  allProducts: Product[] = [];
+  originalProducts: Product[] = [];
+  products: Product[] = [];
+  productsPage: number = 1;
+  productsPageSize: number = 50;
+  searchTerm: string = '';
+
   backendBaseUrl: string = environment.apiBaseUrl;
+  uploadsBaseUrl: string = environment.uploadsBaseUrl;
 
   product = {
     product_name: '',
@@ -111,14 +134,13 @@ export class AdminDashboardComponent implements OnInit {
   };
 
   selectedFile: File | null = null;
-
   imageError: string | null = null;
 
   uploading: boolean = false;
   uploadProgress: number = 0;
   uploadSuccess: boolean = false;
 
-readonly MAX_IMAGE_SIZE_BYTES = 1024 * 1024; // 1 MB
+  readonly MAX_IMAGE_SIZE_BYTES = 1024 * 1024; // 1 MB
 
   categories: string[] = ['رواية', 'تنمية', 'ديني', 'قاموس', 'صحة', 'اعمال', 'فن', 'تاريخ', 'تربية'];
 
@@ -141,6 +163,201 @@ readonly MAX_IMAGE_SIZE_BYTES = 1024 * 1024; // 1 MB
         this.router.navigate(['/']);
       }
     });
+  }
+
+  switchView(view: 'orders' | 'requestedBooks' | 'printOrders' | 'addProduct' | 'products'): void {
+    this.currentView = view;
+    if (view === 'orders') {
+      this.loadOrders();
+    } else if (view === 'requestedBooks') {
+      this.fetchRequestedBooks();
+    } else if (view === 'printOrders') {
+      this.loadPrintOrders();
+    } else if (view === 'products') {
+      this.loadProducts();
+    }
+  }
+
+  loadProducts(): void {
+    this.http.get<{ success: boolean; products: Product[] }>(`${this.backendBaseUrl}/admin/products`).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.allProducts = response.products;
+          this.originalProducts = JSON.parse(JSON.stringify(response.products)); // deep copy for change detection
+          this.updateProductsPage();
+        }
+      },
+      error: (err) => {
+        console.error('Error loading products:', err);
+      }
+    });
+  }
+
+  get filteredProducts(): Product[] {
+    if (!this.searchTerm) {
+      return this.allProducts;
+    }
+    const lowerSearch = this.searchTerm.toLowerCase();
+    return this.allProducts.filter(p => p.product_name.toLowerCase().includes(lowerSearch));
+  }
+
+  updateProductsPage(): void {
+    const start = (this.productsPage - 1) * this.productsPageSize;
+    const end = this.productsPage * this.productsPageSize;
+    this.products = this.filteredProducts.slice(start, end);
+  }
+
+  nextProductsPage(): void {
+    if (this.productsPage < this.totalProductsPages()) {
+      this.productsPage++;
+      this.updateProductsPage();
+      this.scrollToTop();
+    }
+  }
+
+  onSearchTermChange(): void {
+    this.productsPage = 1;
+    this.updateProductsPage();
+  }
+
+  prevProductsPage(): void {
+    if (this.productsPage > 1) {
+      this.productsPage--;
+      this.updateProductsPage();
+      this.scrollToTop();
+    }
+  }
+
+  totalProductsPages(): number {
+    return Math.ceil(this.filteredProducts.length / this.productsPageSize);
+  }
+
+  updateProduct(product: Product): void {
+    const updateData = {
+      product_name: product.product_name,
+      product_quantity: product.product_quantity,
+      product_category: product.product_category,
+      product_description: product.product_description,
+      product_price: product.product_price,
+      price_cost: product.price_cost
+    };
+    this.http.patch(`${this.backendBaseUrl}/admin/products/${product.products_id}`, updateData).subscribe({
+      next: () => {
+        alert('تم تحديث بيانات المنتج بنجاح');
+        this.loadProducts();
+      },
+      error: (err) => {
+        console.error('Error updating product:', err);
+        alert('حدث خطأ أثناء تحديث بيانات المنتج');
+      }
+    });
+  }
+
+  hasProductChanged(product: Product): boolean {
+    const original = this.originalProducts.find(p => p.products_id === product.products_id);
+    if (!original) return true;
+    return (
+      product.product_name !== original.product_name ||
+      product.product_quantity !== original.product_quantity ||
+      product.product_category !== original.product_category ||
+      product.product_description !== original.product_description ||
+      product.product_price !== original.product_price ||
+      product.price_cost !== original.price_cost
+    );
+  }
+
+  replaceProductImage(product: Product, file: File | null): void {
+    if (!file) {
+      alert('يرجى اختيار صورة جديدة للمنتج');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('image', file);
+    this.http.post(`${this.backendBaseUrl}/admin/products/${product.products_id}/image`, formData).subscribe({
+      next: () => {
+        alert('تم تحديث صورة المنتج بنجاح');
+        this.loadProducts();
+      },
+      error: (err) => {
+        console.error('Error replacing product image:', err);
+        alert('حدث خطأ أثناء تحديث صورة المنتج');
+      }
+    });
+  }
+
+  deleteProduct(product: Product): void {
+    if (confirm('هل أنت متأكد من حذف هذا المنتج نهائياً؟ سيتم حذف الصورة أيضاً.')) {
+      this.http.delete(`/api/admin/products/${product.products_id}`).subscribe({
+        next: () => {
+          alert('تم حذف المنتج بنجاح');
+          this.loadProducts();
+        },
+        error: (err) => {
+          console.error('Error deleting product:', err);
+          alert('حدث خطأ أثناء حذف المنتج');
+        }
+      });
+    }
+  }
+
+  handleImageError(event: any) {
+    const imageElement = event.target;
+
+    if (!imageElement.errorStep) {
+      imageElement.errorStep = 1;
+    } else {
+      imageElement.errorStep++;
+    }
+
+    const imageName = imageElement.src.split('/').pop().split('.')[0];
+
+    switch (imageElement.errorStep) {
+      case 1:
+        imageElement.src = this.uploadsBaseUrl + `/${imageName}.webp`;
+        break;
+      case 2:
+        imageElement.src = this.uploadsBaseUrl + `/${imageName}.png`;
+        break;
+      case 3:
+        imageElement.src = this.uploadsBaseUrl + `/${imageName}.jpg`;
+        break;
+      default:
+        imageElement.src = this.uploadsBaseUrl + '/default.png';
+        break;
+    }
+  }
+
+  exportProductsToExcel(): void {
+    const worksheet = XLSX.utils.json_to_sheet(this.products);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Products');
+    XLSX.writeFile(workbook, 'products.xlsx');
+  }
+
+  importProductsFromExcel(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const data = e.target?.result;
+      if (!data) return;
+      const workbook = XLSX.read(data, { type: 'binary' });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const importedProducts: Product[] = XLSX.utils.sheet_to_json(sheet);
+      // Update products one by one
+      importedProducts.forEach((prod) => {
+        if (prod.products_id) {
+          this.updateProduct(prod);
+        }
+      });
+      alert('تم استيراد وتحديث المنتجات من ملف Excel');
+      this.loadProducts();
+    };
+    reader.readAsBinaryString(file);
   }
 
   confirmPrintOrderShipment(userId: string, orderId: string, newStatus: string): void {
@@ -195,17 +412,6 @@ readonly MAX_IMAGE_SIZE_BYTES = 1024 * 1024; // 1 MB
     return encodeURIComponent(value);
   }
 
-  switchView(view: 'orders' | 'requestedBooks' | 'printOrders' | 'addProduct'): void {
-    this.currentView = view;
-    if (view === 'orders') {
-      this.loadOrders();
-    } else if (view === 'requestedBooks') {
-      this.fetchRequestedBooks();
-    } else if (view === 'printOrders') {
-      this.loadPrintOrders();
-    }
-  }
-
   formatOrderDate(dateString: string): string {
     const date = new Date(dateString);
     const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' };
@@ -242,8 +448,8 @@ readonly MAX_IMAGE_SIZE_BYTES = 1024 * 1024; // 1 MB
             };
           }
           groupedOrdersMap[order._id].products.push({
-            book: order.book,
-            quantity: order.quantity
+            product_name: order.book,
+            product_quantity: order.quantity
           });
         });
 
@@ -448,16 +654,16 @@ readonly MAX_IMAGE_SIZE_BYTES = 1024 * 1024; // 1 MB
   }
 
   onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
     this.imageError = null;
-    if (input.files && input.files.length > 0) {
+    const input = event.target as HTMLInputElement | null;
+    if (input && input.files && input.files.length > 0) {
       const file = input.files[0];
       const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/svg+xml'];
       if (!validImageTypes.includes(file.type)) {
         this.imageError = 'يرجى تحميل ملف صورة صالح (JPEG, PNG, GIF, WEBP, BMP, SVG).';
         this.selectedFile = null;
       } else if (file.size > this.MAX_IMAGE_SIZE_BYTES) {
-this.imageError = `حجم الصورة أكبر من 1 ميجابايت. يرجى تحميل صورة أصغر.`;
+        this.imageError = `حجم الصورة أكبر من 1 ميجابايت. يرجى تحميل صورة أصغر.`;
         this.selectedFile = null;
       } else {
         this.selectedFile = file;
