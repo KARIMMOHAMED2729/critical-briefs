@@ -1,3 +1,4 @@
+
 const { google } = require('googleapis');
 const xlsx = require('xlsx');
 const fs = require('fs');
@@ -226,8 +227,68 @@ async function addProductToExcel(productData) {
   }
 }
 
+// New function to upload Excel file from output.json to Google Drive
+async function uploadExcelFromJson(createCopy = false) {
+  try {
+    const fileId = process.env.GOOGLE_DRIVE_FILE_ID;
+    if (!fileId) {
+      throw new Error('Missing required environment variable: GOOGLE_DRIVE_FILE_ID');
+    }
+
+    // Read output.json
+    const jsonData = JSON.parse(fs.readFileSync('output.json', 'utf-8'));
+
+    // Convert JSON to sheet
+    const worksheet = xlsx.utils.json_to_sheet(jsonData);
+
+    // Create new workbook and append sheet
+    const workbook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+    // Write workbook to buffer
+    const wbout = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+    const client = await auth.getClient();
+    const drive = google.drive({ version: 'v3', auth: client });
+
+    if (createCopy) {
+      // Create a new file on Google Drive as a copy
+      const fileMetadata = {
+        name: `Copy_of_output_${Date.now()}.xlsx`,
+        mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      };
+      const media = {
+        mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        body: wbout
+      };
+      const response = await drive.files.create({
+        resource: fileMetadata,
+        media: media,
+        fields: 'id, name'
+      });
+      console.log(`✅ New Excel copy created on Google Drive with ID: ${response.data.id}`);
+      return response.data;
+    } else {
+      // Update existing file
+      await drive.files.update({
+        fileId,
+        media: {
+          mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          body: wbout
+        }
+      });
+      console.log('✅ Excel file uploaded from output.json to Google Drive.');
+      return true;
+    }
+  } catch (error) {
+    console.error('❌ Error uploading Excel from JSON:', error);
+    throw error;
+  }
+}
+
 module.exports = { 
   downloadAndConvertExcel,
   categoryMap,
-  addProductToExcel
+  addProductToExcel,
+  uploadExcelFromJson
 };

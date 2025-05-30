@@ -301,11 +301,30 @@ async function deleteProduct(req, res) {
   }
 }
 
+const { uploadExcelFromJson } = require('../services/excel.service');
+
+async function syncJsonToExcel(req, res) {
+  try {
+    // Check if query param createCopy is set to true
+    const createCopy = req.query.createCopy === 'true';
+    const result = await uploadExcelFromJson(createCopy);
+    if (createCopy) {
+      res.json({ success: true, message: 'New Excel copy created on Google Drive.', file: result });
+    } else {
+      res.json({ success: true, message: 'Excel file updated from output.json and uploaded to Google Drive.' });
+    }
+  } catch (error) {
+    console.error('Error in syncJsonToExcel:', error);
+    res.status(500).json({ success: false, message: 'Failed to update Excel file from output.json.' });
+  }
+}
+
 module.exports = {
   upload,
   addProduct,
   listProducts,
   updateProduct,
   replaceProductImage,
-  deleteProduct
+  deleteProduct,
+  syncJsonToExcel
 };
