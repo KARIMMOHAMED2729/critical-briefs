@@ -100,6 +100,9 @@ export class AdminDashboardComponent implements OnInit {
   isAdmin: boolean = false;
   currentView: 'orders' | 'requestedBooks' | 'printOrders' | 'addProduct' | 'products' = 'orders';
 
+  manualPromotionStartDate: string = '';
+  manualPromotionEndDate: string = '';
+
   // Pagination state for orders
   ordersPage: number = 1;
   ordersPageSize: number = 10;
@@ -157,6 +160,7 @@ export class AdminDashboardComponent implements OnInit {
       if (user && user.email === 'admin@example.com' && user.role === 'admin') {
         this.isAdmin = true;
         this.loadOrders();
+        this.loadPromotionDates();
         this.loadNotifications();
       } else {
         this.isAdmin = false;
@@ -176,6 +180,48 @@ export class AdminDashboardComponent implements OnInit {
     } else if (view === 'products') {
       this.loadProducts();
     }
+  }
+
+  loadPromotionDates(): void {
+    this.http.get<{ success: boolean; startDate: string; endDate: string }>(`${this.backendBaseUrl}/admin/promotion-dates`).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.manualPromotionStartDate = response.startDate ? response.startDate.substring(0, 10) : '';
+          this.manualPromotionEndDate = response.endDate ? response.endDate.substring(0, 10) : '';
+        }
+      },
+      error: (err) => {
+        console.error('Error loading promotion dates:', err);
+      }
+    });
+  }
+
+  savePromotionDates(): void {
+    if (!this.manualPromotionStartDate || !this.manualPromotionEndDate) {
+      alert('يرجى إدخال تاريخ بداية ونهاية العرض.');
+      return;
+    }
+    if (this.manualPromotionEndDate <= this.manualPromotionStartDate) {
+      alert('يجب أن يكون تاريخ نهاية العرض بعد تاريخ البداية.');
+      return;
+    }
+    const payload = {
+      startDate: this.manualPromotionStartDate,
+      endDate: this.manualPromotionEndDate
+    };
+    this.http.post(`${this.backendBaseUrl}/admin/update-promotion-dates`, payload).subscribe({
+      next: (response: any) => {
+        if (response.success) {
+          alert('تم حفظ تواريخ العرض بنجاح.');
+        } else {
+          alert('حدث خطأ أثناء حفظ تواريخ العرض.');
+        }
+      },
+      error: (err) => {
+        console.error('Error saving promotion dates:', err);
+        alert('حدث خطأ أثناء حفظ تواريخ العرض.');
+      }
+    });
   }
 
   loadProducts(): void {

@@ -21,9 +21,6 @@ function roundUpToNearestFive(num) {
   return Math.ceil(num / 5) * 5;
 }
 
-const manualPromotionStartDate = '2025-05-11'; // Add manual promotion start date here
-const manualPromotionEndDate = '2025-06-10'; // Add manual promotion end date here
-
 async function downloadAndConvertExcel(fileId, promotionStartDateStr, promotionEndDateStr) {
   const client = await auth.getClient();
   const drive = google.drive({ version: 'v3', auth: client });
@@ -39,9 +36,9 @@ async function downloadAndConvertExcel(fileId, promotionStartDateStr, promotionE
   const sheet = workbook.Sheets[sheetName];
   let json = xlsx.utils.sheet_to_json(sheet);
 
-  // Use manualPromotionStartDate and manualPromotionEndDate if no parameters provided
-  let promotionStartDate = promotionStartDateStr ? new Date(promotionStartDateStr) : new Date(manualPromotionStartDate);
-  let promoEndDate = promotionEndDateStr ? new Date(promotionEndDateStr) : new Date(manualPromotionEndDate);
+  // Use promotionStartDateStr and promotionEndDateStr if provided, else fallback to default dates
+  let promotionStartDate = promotionStartDateStr ? new Date(promotionStartDateStr) : new Date('2025-05-11');
+  let promoEndDate = promotionEndDateStr ? new Date(promotionEndDateStr) : new Date('2025-06-10');
 
   // Filter out products with product_quantity less than 0
   const filteredJson = json.filter(product => {
@@ -254,11 +251,11 @@ async function uploadExcelFromJson(createCopy = false) {
     if (createCopy) {
       // Create a new file on Google Drive as a copy
       const fileMetadata = {
-        name: `Copy_of_output_${Date.now()}.xls`,
-        mimeType: 'application/vnd.ms-excel'
+        name: `Copy_of_output_${Date.now()}.xlsx`,
+        mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       };
       const media = {
-        mimeType: 'application/vnd.ms-excel',
+        mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         body: wbout
       };
       const response = await drive.files.create({
@@ -273,11 +270,11 @@ async function uploadExcelFromJson(createCopy = false) {
       await drive.files.update({
         fileId,
         media: {
-          mimeType: 'application/vnd.ms-excel',
+          mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
           body: wbout
         }
       });
-      console.log('✅ Excel file (xls) uploaded from output.json to Google Drive.');
+      console.log('✅ Excel file uploaded from output.json to Google Drive.');
       return true;
     }
   } catch (error) {

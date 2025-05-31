@@ -4,6 +4,7 @@ const multer = require('multer');
 const sharp = require('sharp');
 const { addProductToExcel, categoryMap, downloadAndConvertExcel } = require('../services/excel.service');
 const { generateSitemap } = require('../services/sitemap.service');
+const PromotionDate = require('../models/PromotionDate.model');
 
 // Helper function to generate random barcode string
 function generateRandomBarcode(length = 12) {
@@ -454,6 +455,62 @@ async function batchUpdateProducts(req, res) {
   }
 }
 
+async function getPromotionDates(req, res) {
+  try {
+    let promotionDate = await PromotionDate.findOne().sort({ createdAt: -1 }).exec();
+    if (!promotionDate) {
+      // If no promotion dates found, return default dates
+      promotionDate = {
+        startDate: new Date('2025-05-11'),
+        endDate: new Date('2025-06-10')
+      };
+    }
+    res.json({
+      success: true,
+      startDate: promotionDate.startDate,
+      endDate: promotionDate.endDate
+    });
+  } catch (error) {
+    console.error('Error in getPromotionDates:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+}
+
+async function updatePromotionDates(req, res) {
+  try {
+    const { startDate, endDate } = req.body;
+    if (!startDate || !endDate) {
+      return res.status(400).json({ success: false, message: 'Missing startDate or endDate' });
+    }
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return res.status(400).json({ success: false, message: 'Invalid date format' });
+    }
+    if (end <= start) {
+      return res.status(400).json({ success: false, message: 'endDate must be after startDate' });
+    }
+
+    // Save new promotion dates document
+    const newPromotionDate = new PromotionDate({
+      startDate: start,
+      endDate: end
+    });
+    await newPromotionDate.save();
+
+    // Update output.json by re-running downloadAndConvertExcel with new dates
+    const fileId = process.env.GOOGLE_DRIVE_FILE_ID;
+    if (fileId) {
+      await downloadAndConvertExcel(fileId, startDate, endDate);
+    }
+
+    res.json({ success: true, message: 'Promotion dates updated successfully' });
+  } catch (error) {
+    console.error('Error in updatePromotionDates:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+}
+
 module.exports = {
   upload,
   addProduct,
@@ -462,5 +519,7 @@ module.exports = {
   replaceProductImage,
   deleteProduct,
   syncJsonToExcel,
-  batchUpdateProducts
+  batchUpdateProducts,
+  getPromotionDates,
+  updatePromotionDates
 };

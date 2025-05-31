@@ -23,4 +23,11 @@ router.post('/sync-json-to-excel', adminController.syncJsonToExcel);
 // New route for batch update products
 router.post('/products/batch-update', adminController.batchUpdateProducts);
 
+// New route to update promotion start and end dates and update Excel/output.json
+router.post('/update-promotion-dates', adminController.updatePromotionDates);
+
+// New route to get current promotion dates
+router.get('/promotion-dates', adminController.getPromotionDates);
+
+
 module.exports = router;
