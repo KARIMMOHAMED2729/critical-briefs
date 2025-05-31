@@ -110,7 +110,7 @@
         }"
         class="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:text-gray-200"
       >
-        <option value="" disabled>اختر الفئة</option>
+        <!--<option value="" disabled>اختر الفئة</option>-->
         <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
       </select>
       <p *ngIf="productCategory.invalid && (productCategory.dirty || productCategory.touched)" class="text-red-500 text-sm mt-1 dark:text-red-400">

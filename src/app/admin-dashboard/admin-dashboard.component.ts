@@ -145,7 +145,17 @@ export class AdminDashboardComponent implements OnInit {
 
   readonly MAX_IMAGE_SIZE_BYTES = 1024 * 1024; // 1 MB
 
-  categories: string[] = ['رواية', 'تنمية', 'ديني', 'قاموس', 'صحة', 'اعمال', 'فن', 'تاريخ', 'تربية'];
+  categories: string[] = [
+    'روايات وقصص',
+    'تطوير الذات وعلم النفس',
+    'كتب دينية',
+    'قواميس ومراجع',
+    'صحة وطب وعلوم',
+    'أعمال وتسويق ومالية',
+    'فنون وحرف',
+    'تاريخ وسير ذاتية',
+    'تربية وأطفال'
+  ];
 
   constructor(
     private http: HttpClient,
@@ -228,6 +238,16 @@ export class AdminDashboardComponent implements OnInit {
     this.http.get<{ success: boolean; products: Product[] }>(`${this.backendBaseUrl}/admin/products`).subscribe({
       next: (response) => {
         if (response.success) {
+          // Trim product_category to match categories array exactly
+          response.products.forEach(p => {
+            if (p.product_category && typeof p.product_category === 'string') {
+              p.product_category = p.product_category.trim();
+            }
+            // Ensure product_category is set to a valid category or default to first category
+            if (!p.product_category || !this.categories.includes(p.product_category)) {
+              p.product_category = this.categories[0];
+            }
+          });
           this.allProducts = response.products;
           this.originalProducts = JSON.parse(JSON.stringify(response.products)); // deep copy for change detection
           this.updateProductsPage();

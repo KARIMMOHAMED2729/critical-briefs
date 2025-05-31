@@ -98,7 +98,7 @@ async function addProduct(req, res) {
     await addProductToExcel(productData);
 
     // Update Excel file after product addition
-    await updateExcelFromJson(process.env.GOOGLE_DRIVE_FILE_update);
+    await updateExcelFromJson(process.env.GOOGLE_DRIVE_FILE_ID);
 
 
     // Update sitemap.xml after product addition
@@ -117,7 +117,9 @@ async function addProduct(req, res) {
 // New API to list all products
 async function listProducts(req, res) {
   try {
-    const products = await downloadAndConvertExcel(process.env.GOOGLE_DRIVE_FILE_ID);
+    // Use the same file ID as used for adding products to keep consistency
+    const products = await downloadAndConvertExcel(process.env.GOOGLE_DRIVE_FILE_update);
+    // Do not map product_category back to short keys, send as is
     res.json({ success: true, products });
   } catch (error) {
     console.error('Error in listProducts:', error);

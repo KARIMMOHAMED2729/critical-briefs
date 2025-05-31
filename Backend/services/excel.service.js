@@ -47,13 +47,19 @@ async function downloadAndConvertExcel(fileId, promotionStartDateStr, promotionE
   const updatedData = filteredJson.map(product => {
     const product_id = product.products_id;
     let name = product.product_name || '';
+  // Prefer product_category field if valid
+  let category = null;
+  if (product.product_category && Object.values(categoryMap).includes(product.product_category)) {
+    category = product.product_category;
+  } else {
     let categoryKey = name.split('-')[0].trim();
-    const category = categoryMap[categoryKey] || 'غير مصنف';
-    product.product_category = category;
+    category = categoryMap[categoryKey] || 'غير مصنف';
+  }
+  product.product_category = category;
 
-    if (name.includes('-')) {
-      product.product_name = name.split('-').slice(1).join('-').trim();
-    }
+  if (name.includes('-')) {
+    product.product_name = name.split('-').slice(1).join('-').trim();
+  }
 
     product.product_image = product_id;
 
@@ -156,9 +162,9 @@ async function downloadAndConvertExcel(fileId, promotionStartDateStr, promotionE
 // New function to add product to Excel file and update output.json
 async function addProductToExcel(productData) {
   try {
-    const fileId = process.env.GOOGLE_DRIVE_FILE_update;
+    const fileId = process.env.GOOGLE_DRIVE_FILE_ID;
     if (!fileId) {
-      throw new Error('Missing required environment variable: GOOGLE_DRIVE_FILE_update');
+      throw new Error('Missing required environment variable: GOOGLE_DRIVE_FILE_ID');
     }
     const client = await auth.getClient();
     const drive = google.drive({ version: 'v3', auth: client });
