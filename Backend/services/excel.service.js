@@ -1,4 +1,3 @@
-
 const { google } = require('googleapis');
 const xlsx = require('xlsx');
 const fs = require('fs');
@@ -157,9 +156,9 @@ async function downloadAndConvertExcel(fileId, promotionStartDateStr, promotionE
 // New function to add product to Excel file and update output.json
 async function addProductToExcel(productData) {
   try {
-    const fileId = process.env.GOOGLE_DRIVE_FILE_ID;
+    const fileId = process.env.GOOGLE_DRIVE_FILE_update;
     if (!fileId) {
-      throw new Error('Missing required environment variable: GOOGLE_DRIVE_FILE_ID');
+      throw new Error('Missing required environment variable: GOOGLE_DRIVE_FILE_update');
     }
     const client = await auth.getClient();
     const drive = google.drive({ version: 'v3', auth: client });
@@ -227,9 +226,9 @@ async function addProductToExcel(productData) {
 // New function to upload Excel file from output.json to Google Drive
 async function uploadExcelFromJson(createCopy = false) {
   try {
-    const fileId = process.env.GOOGLE_DRIVE_FILE_ID;
+    const fileId = process.env.GOOGLE_DRIVE_FILE_update;
     if (!fileId) {
-      throw new Error('Missing required environment variable: GOOGLE_DRIVE_FILE_ID');
+      throw new Error('Missing required environment variable: GOOGLE_DRIVE_FILE_update');
     }
 
     // Read output.json
@@ -283,9 +282,51 @@ async function uploadExcelFromJson(createCopy = false) {
   }
 }
 
+// New function to update Excel file from output.json using Google Drive file ID
+async function updateExcelFromJson(fileId) {
+  try {
+    if (!fileId) {
+      throw new Error('Missing required file ID for Excel update');
+    }
+
+    // Read output.json
+    const jsonData = JSON.parse(fs.readFileSync('output.json', 'utf-8'));
+
+    const client = await auth.getClient();
+    const drive = google.drive({ version: 'v3', auth: client });
+    const xlsx = require('xlsx');
+
+    // Convert JSON to sheet
+    const worksheet = xlsx.utils.json_to_sheet(jsonData);
+
+    // Create new workbook and append sheet
+    const workbook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+    // Write workbook to buffer
+    const wbout = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+    // Upload updated Excel file back to Google Drive
+    await drive.files.update({
+      fileId,
+      media: {
+        mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        body: wbout
+      }
+    });
+
+    console.log('✅ Excel file updated from output.json on Google Drive.');
+    return true;
+  } catch (error) {
+    console.error('❌ Error updating Excel from JSON:', error);
+    throw error;
+  }
+}
+
 module.exports = { 
   downloadAndConvertExcel,
   categoryMap,
   addProductToExcel,
-  uploadExcelFromJson
+  uploadExcelFromJson,
+  updateExcelFromJson
 };

@@ -20,6 +20,17 @@ router.delete('/products/:barcode', adminController.deleteProduct);
 // Route to sync output.json to Excel and upload to Google Drive
 router.post('/sync-json-to-excel', adminController.syncJsonToExcel);
 
+// New route to sync output.json to Google Sheets
+router.post('/sync-json-to-google-sheets', async (req, res) => {
+  try {
+    await adminController.updateGoogleSheetFromJson();
+    res.json({ success: true, message: 'Google Sheets updated from output.json.' });
+  } catch (error) {
+    console.error('Error syncing JSON to Google Sheets:', error);
+    res.status(500).json({ success: false, message: 'Failed to update Google Sheets from output.json.' });
+  }
+});
+
 // New route for batch update products
 router.post('/products/batch-update', adminController.batchUpdateProducts);
 

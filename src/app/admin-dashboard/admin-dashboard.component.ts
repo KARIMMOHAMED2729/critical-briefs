@@ -319,6 +319,15 @@ export class AdminDashboardComponent implements OnInit {
       next: () => {
         alert('تم حفظ جميع التغييرات بنجاح');
         this.loadProducts();
+        // Call sync-json-to-excel to update Excel file after batch update
+        this.http.post(`${this.backendBaseUrl}/admin/sync-json-to-excel`, {}).subscribe({
+          next: () => {
+            console.log('Excel file updated after batch update');
+          },
+          error: (err) => {
+            console.error('Error updating Excel file after batch update:', err);
+          }
+        });
       },
       error: (err) => {
         console.error('Error batch updating products:', err);

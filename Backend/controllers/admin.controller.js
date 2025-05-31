@@ -2,7 +2,8 @@ const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 const sharp = require('sharp');
-const { addProductToExcel, categoryMap, downloadAndConvertExcel } = require('../services/excel.service');
+const { addProductToExcel, categoryMap, downloadAndConvertExcel, updateExcelFromJson } = require('../services/excel.service');
+
 const { generateSitemap } = require('../services/sitemap.service');
 const PromotionDate = require('../models/PromotionDate.model');
 
@@ -96,6 +97,10 @@ async function addProduct(req, res) {
     // Call service to add product to Excel
     await addProductToExcel(productData);
 
+    // Update Excel file after product addition
+    await updateExcelFromJson(process.env.GOOGLE_DRIVE_FILE_update);
+
+
     // Update sitemap.xml after product addition
     await generateSitemap();
 
@@ -183,6 +188,9 @@ async function updateProduct(req, res) {
     // Update output.json by re-running downloadAndConvertExcel
     await downloadAndConvertExcel(fileId);
 
+    // Update Excel file after product update
+    await updateExcelFromJson(process.env.GOOGLE_DRIVE_FILE_update);
+
     res.json({ success: true, message: 'Product updated successfully' });
   } catch (error) {
     console.error('Error in updateProduct:', error);
@@ -199,7 +207,7 @@ async function batchUpdateProducts(req, res) {
     }
 
     // Download current Excel file
-    const fileId = process.env.GOOGLE_DRIVE_FILE_ID;
+    const fileId = process.env.GOOGLE_DRIVE_FILE_update;
     if (!fileId) {
       return res.status(500).json({ success: false, message: 'Missing Google Drive file ID' });
     }
@@ -250,6 +258,9 @@ async function batchUpdateProducts(req, res) {
 
     // Update output.json by re-running downloadAndConvertExcel
     await downloadAndConvertExcel(fileId);
+
+    // Update Excel file after batch update
+    await updateExcelFromJson(fileId);
 
     res.json({ success: true, message: 'Batch update of products successful' });
   } catch (error) {
