@@ -735,7 +735,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/2</loc>
+          <loc>http://localhost:3000/book/وهج-البنفسج-1-2</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -771,7 +771,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/نجيب-محفوظ</loc>
+          <loc>http://localhost:3000/book/حديث-الصباح-والمساء---نجيب-محفوظ</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -783,7 +783,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/مكتبة-الصفا</loc>
+          <loc>http://localhost:3000/book/الداء-والدواء---مكتبة-الصفا</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -963,19 +963,19 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/قبل-ان-تتلاشي-ذاكرتك</loc>
+          <loc>http://localhost:3000/book/قبل-ان-تبرد-القهوه---قبل-ان-تتلاشي-ذاكرتك</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/قبل-ان-تقول-وداعا</loc>
+          <loc>http://localhost:3000/book/قبل-ان-تبرد-القهوه---قبل-ان-تقول-وداعا</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/مكتبة-الصفا</loc>
+          <loc>http://localhost:3000/book/عون-الرحمن-في-حفظ-القرآن---مكتبة-الصفا</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -1191,7 +1191,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/المبدع-الصغير</loc>
+          <loc>http://localhost:3000/book/الداء-والدواء---المبدع-الصغير</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -1227,19 +1227,19 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/قبل-ان-تبرد-القهوة</loc>
+          <loc>http://localhost:3000/book/حكايات-من-المقهي---قبل-ان-تبرد-القهوة</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/نجيب-محفوظ</loc>
+          <loc>http://localhost:3000/book/زقاق-المدق---نجيب-محفوظ</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/نجيب-محفوظ</loc>
+          <loc>http://localhost:3000/book/افراح-القبة---نجيب-محفوظ</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -1251,7 +1251,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/زاد</loc>
+          <loc>http://localhost:3000/book/شرح-الاربعين-النوويه---زاد</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -1317,7 +1317,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/مكتبة-الصفا</loc>
+          <loc>http://localhost:3000/book/صفة-الصفوة---مكتبة-الصفا</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -1437,7 +1437,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/مستعمل</loc>
+          <loc>http://localhost:3000/book/نور-الابصار---مستعمل</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -1449,7 +1449,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/محمود-المصري</loc>
+          <loc>http://localhost:3000/book/أسباب-النزول---محمود-المصري</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -2247,7 +2247,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/</loc>
+          <loc>http://localhost:3000/book/الجريمة-والعقاب--</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -2295,25 +2295,25 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/شمواه</loc>
+          <loc>http://localhost:3000/book/الرحيق-المختوم---شمواه</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/</loc>
+          <loc>http://localhost:3000/book/علي-بن-ابي-طالب--</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/شيخ-احمد-حجازي</loc>
+          <loc>http://localhost:3000/book/شرح-الأربعون-النوويه---شيخ-احمد-حجازي</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/سعودي</loc>
+          <loc>http://localhost:3000/book/تحفة-العروس---سعودي</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -2403,7 +2403,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/الشعراوي</loc>
+          <loc>http://localhost:3000/book/اصلاح-القلوب---الشعراوي</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -2445,19 +2445,19 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/مكتبة-الصفا</loc>
+          <loc>http://localhost:3000/book/زاد-المعاد---مكتبة-الصفا</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/مستعمل</loc>
+          <loc>http://localhost:3000/book/التذكره---مستعمل</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/مستعمل</loc>
+          <loc>http://localhost:3000/book/حياة-الصحابة---مستعمل</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -2847,7 +2847,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/سيرة-الحب</loc>
+          <loc>http://localhost:3000/book/كلام-للبنات---سيرة-الحب</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -2859,7 +2859,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/من-روائع-قصص-العفة</loc>
+          <loc>http://localhost:3000/book/كلام-للبنات---من-روائع-قصص-العفة</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -2877,7 +2877,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/الخطوبة-وأحلام-البنات</loc>
+          <loc>http://localhost:3000/book/كلام-للبنات---الخطوبة-وأحلام-البنات</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -2889,7 +2889,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/الجواب-الكافي-لمن-سأل-عن-الدواء-الشافي</loc>
+          <loc>http://localhost:3000/book/الداء-والدواء---الجواب-الكافي-لمن-سأل-عن-الدواء-الشافي</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -2980,6 +2980,12 @@
       
         <url>
           <loc>http://localhost:3000/book/شرح-الاربعين-النووية</loc>
+          <changefreq>weekly</changefreq>
+          <priority>0.8</priority>
+        </url>
+      
+        <url>
+          <loc>http://localhost:3000/book/شبكة-العنكبوت</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>

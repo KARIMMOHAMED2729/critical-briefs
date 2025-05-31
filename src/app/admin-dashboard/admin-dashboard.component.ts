@@ -157,6 +157,19 @@ export class AdminDashboardComponent implements OnInit {
     'تربية وأطفال'
   ];
 
+  // Reverse map from full category name to short key
+  categoryReverseMap: { [key: string]: string } = {
+    'روايات وقصص': 'رواية',
+    'تطوير الذات وعلم النفس': 'تنمية',
+    'كتب دينية': 'ديني',
+    'قواميس ومراجع': 'قاموس',
+    'صحة وطب وعلوم': 'صحة',
+    'أعمال وتسويق ومالية': 'اعمال',
+    'فنون وحرف': 'فن',
+    'تاريخ وسير ذاتية': 'تاريخ',
+    'تربية وأطفال': 'تربية'
+  };
+
   constructor(
     private http: HttpClient,
     private authService: AuthService,
@@ -796,11 +809,14 @@ export class AdminDashboardComponent implements OnInit {
       return;
     }
 
+    // Convert full category name to short key before sending
+    const shortCategory = this.categoryReverseMap[this.product.product_category] || this.product.product_category;
+
     const formData = new FormData();
     formData.append('image', this.selectedFile);
     formData.append('product_name', this.product.product_name);
     formData.append('product_quantity', this.product.product_quantity.toString());
-    formData.append('product_category', this.product.product_category);
+    formData.append('product_category', shortCategory);
     formData.append('product_description', this.product.product_description);
     formData.append('product_price', this.product.product_price.toString());
     formData.append('price_cost', this.product.price_cost.toString());
