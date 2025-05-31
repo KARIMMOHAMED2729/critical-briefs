@@ -36,10 +36,12 @@
     </div>
 
     <!-- Average Rating Display -->
-    <div class="mb-2 flex items-center space-x-2">
+    <div class="mb-2 flex items-center gap-2">
       <ng-container *ngFor="let star of [1,2,3,4,5]">
-        <fa-icon *ngIf="star <= roundedAverageRating()" [icon]="faStar" class="text-yellow-400 h-5 w-5"></fa-icon>
-        <fa-icon *ngIf="star > roundedAverageRating()" [icon]="faStarRegular" class="text-gray-300 dark:text-gray-600 h-5 w-5"></fa-icon>
+        <span class="w-6 flex justify-center">
+          <fa-icon *ngIf="star <= roundedAverageRating()" [icon]="faStar" class="text-yellow-400 h-5 w-5"></fa-icon>
+          <fa-icon *ngIf="star > roundedAverageRating()" [icon]="faStarRegular" class="text-gray-300 dark:text-gray-600 h-5 w-5"></fa-icon>
+        </span>
       </ng-container>
       <span class="text-sm text-gray-600 dark:text-gray-300">({{ ratingCount }} تقييم)</span>
     </div>
