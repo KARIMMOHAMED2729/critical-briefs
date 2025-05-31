@@ -99,7 +99,10 @@ async function addProduct(req, res) {
 
     // Update Excel file after product addition
     await updateExcelFromJson(process.env.GOOGLE_DRIVE_FILE_ID);
-
+    // Then update the update file
+    await updateExcelFromJson(process.env.GOOGLE_DRIVE_FILE_update);
+    // Removed second update to main file
+    // await updateExcelFromJson(process.env.GOOGLE_DRIVE_FILE_ID);
 
     // Update sitemap.xml after product addition
     await generateSitemap();
@@ -192,6 +195,8 @@ async function updateProduct(req, res) {
 
     // Update Excel file after product update
     await updateExcelFromJson(process.env.GOOGLE_DRIVE_FILE_update);
+    // Removed additional update to main file as per user request
+    // await updateExcelFromJson(process.env.GOOGLE_DRIVE_FILE_ID);
 
     res.json({ success: true, message: 'Product updated successfully' });
   } catch (error) {
