@@ -225,11 +225,17 @@ this.http.get<{ bookId: string; averageRating: number; ratingCount: number }>(`$
     this.authService.loadUserData(userId);
   }
   // دالة البحث لحظيًا
+  private normalizeArabic(text: string): string {
+    return text.replace(/[أإآ]/g, 'ا');
+  }
+
   searchBooks(): void {
     this.dataService.getData().subscribe(data => {
-      const filteredBooks = data.filter((book: Book) =>
-        book.product_name.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
+      const normalizedQuery = this.normalizeArabic(this.searchQuery.toLowerCase());
+      const filteredBooks = data.filter((book: Book) => {
+        const normalizedProductName = this.normalizeArabic(book.product_name.toLowerCase());
+        return normalizedProductName.includes(normalizedQuery);
+      });
       this.totalBooks = filteredBooks.length;
       this.books = filteredBooks.slice((this.currentPage - 1) * this.booksPerPage, this.currentPage * this.booksPerPage);
       this.fetchRatingsForBooks(); // Fetch ratings after books are loaded

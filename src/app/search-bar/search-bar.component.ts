@@ -30,11 +30,17 @@ export class SearchBarComponent {
     this.onSearch();
   }
 
+  private normalizeArabic(text: string): string {
+    return text.replace(/[أإآ]/g, 'ا');
+  }
+
   onSearchKeyup() {
     if (this.searchQuery.trim()) {
-      this.searchResults = this.allBooks.filter(book =>
-        book.product_name.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
+      const normalizedQuery = this.normalizeArabic(this.searchQuery.toLowerCase());
+      this.searchResults = this.allBooks.filter(book => {
+        const normalizedProductName = this.normalizeArabic(book.product_name.toLowerCase());
+        return normalizedProductName.includes(normalizedQuery);
+      });
     } else {
       this.searchResults = [];
     }
