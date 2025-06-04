@@ -7,22 +7,17 @@ const Tesseract = require('tesseract.js');
 const Epub = require('epub-gen');
 
 const uploadsDir = path.join(__dirname, '../uploads/');
+const epubDir = path.join(uploadsDir, 'epub');
 
 const outputJsonPath = path.join(__dirname, '../output.json');
 
-// Multer storage configuration for saving uploaded PDFs in a project-specific folder
+// Multer storage configuration for saving uploaded PDFs in the epub directory
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // Use project name from request body or generate random folder name
-    let projectName = req.body.projectName;
-    if (!projectName) {
-      projectName = Date.now().toString();
+    if (!fs.existsSync(epubDir)) {
+      fs.mkdirSync(epubDir, { recursive: true });
     }
-    const projectDir = path.join(uploadsDir, projectName);
-    if (!fs.existsSync(projectDir)) {
-      fs.mkdirSync(projectDir, { recursive: true });
-    }
-    cb(null, projectDir);
+    cb(null, epubDir);
   },
   filename: function (req, file, cb) {
     // Use the original filename as is (which is renamed by frontend)
@@ -45,25 +40,29 @@ const upload = multer({ storage: storage, fileFilter: fileFilter }).fields([
   { name: 'projectName', maxCount: 1 }
 ]);
 
-// Helper function to convert PDF pages to images using pdf-poppler (requires poppler-utils installed)
-function convertPdfToImages(pdfPath, outputDir) {
+  // Helper function to convert PDF pages to images using pdf-poppler (requires poppler-utils installed)
+function convertPdfToImages(pdfPath) {
   return new Promise((resolve, reject) => {
-    // Use pdftoppm command to convert PDF pages to PNG images
-    const command = `pdftoppm -png "${pdfPath}" "${path.join(outputDir, 'page')}"`;
+    // Use pdftoppm command to convert PDF pages to PNG images in memory folder
+    const tempDir = path.join(__dirname, '../temp_images');
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
+    const command = `pdftoppm -png "${pdfPath}" "${path.join(tempDir, 'page')}"`;
     exec(command, (error, stdout, stderr) => {
       if (error) {
         reject(error);
       } else {
         // Collect generated image files
-        fs.readdir(outputDir, (err, files) => {
+        fs.readdir(tempDir, (err, files) => {
           if (err) {
             reject(err);
           } else {
             const images = files
               .filter(f => f.startsWith('page') && (f.endsWith('.png')))
-              .map(f => path.join(outputDir, f))
+              .map(f => path.join(tempDir, f))
               .sort();
-            resolve(images);
+            resolve({ images, tempDir });
           }
         });
       }
@@ -87,14 +86,14 @@ function cleanText(text) {
   return text.split('\n').filter(line => !/^\s*\d+\s*$/.test(line)).join('\n');
 }
 
-// Helper function to generate EPUB file
-function generateEpub(outputPath, text) {
+function generateEpub(outputPath, text, title) {
   const option = {
-    title: "OCR Output",
+    title: title || "OCR Output",
     author: "PDF OCR System",
+    css: "body { direction: rtl; text-align: right; font-family: Arial, sans-serif; }",
     content: [
       {
-        title: "Extracted Text",
+        title: title || "Extracted Text",
         data: text.replace(/\n/g, '<br/>')
       }
     ],
@@ -118,13 +117,10 @@ exports.uploadAndProcessPdf = (req, res) => {
         console.error('No file uploaded');
         return res.status(400).json({ success: false, message: 'No file uploaded' });
       }
-      const projectDir = path.dirname(file.path);
-  // console.log('File uploaded to:', file.path);
-  // console.log('Project directory:', projectDir);
 
   // Convert PDF pages to images
   // console.log('Starting PDF to images conversion');
-  const images = await convertPdfToImages(file.path, projectDir);
+  const { images, tempDir } = await convertPdfToImages(file.path);
   // console.log('Images generated:', images);
 
   // Run OCR on images
@@ -136,16 +132,15 @@ exports.uploadAndProcessPdf = (req, res) => {
   extractedText = cleanText(extractedText);
   // console.log('Text cleaned');
 
-  // Save output.txt
+  // Save output.epub only in uploads/epub folder
   const baseName = path.basename(file.filename, path.extname(file.filename));
-  const outputTxtPath = path.join(projectDir, `${baseName}.txt`);
-  fs.writeFileSync(outputTxtPath, extractedText, 'utf8');
-  // console.log('Output text saved to:', outputTxtPath);
-
-  // Save output.epub
-  const outputEpubPath = path.join(projectDir, `${baseName}.epub`);
-  await generateEpub(outputEpubPath, extractedText);
+  const outputEpubPath = path.join(epubDir, `${baseName}.epub`);
+  await generateEpub(outputEpubPath, extractedText, baseName);
   // console.log('Output epub saved to:', outputEpubPath);
+
+  // Clean up temp images and uploaded PDF file
+  fs.rmSync(tempDir, { recursive: true, force: true });
+  fs.unlinkSync(file.path);
 
       res.status(200).json({ success: true, text: extractedText });
     } catch (error) {
