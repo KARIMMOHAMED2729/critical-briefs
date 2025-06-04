@@ -22,10 +22,11 @@ import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { SharedModule } from './shared/shared.module';
 import { FavoritesComponent } from './favorites/favorites.component';
-import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { SearchBarComponent } from './search-bar/search-bar.component';
 import { ChatWindowComponent } from './components/chat-window/chat-window.component';
+import { PdfOcrComponent } from './admin/pdf-ocr/pdf-ocr.component';
 
 @NgModule({
   declarations: [
@@ -44,9 +45,9 @@ import { ChatWindowComponent } from './components/chat-window/chat-window.compon
     SearchResultsComponent,
     HomePageComponent,
     FavoritesComponent,
-    AdminDashboardComponent,
     SearchBarComponent,
-    ChatWindowComponent
+    ChatWindowComponent,
+    AdminDashboardComponent
   ],
   imports: [
     BrowserModule,
@@ -55,7 +56,8 @@ import { ChatWindowComponent } from './components/chat-window/chat-window.compon
     FormsModule,
     SharedModule,
     RegisterComponent,
-    LoginComponent
+    LoginComponent,
+    PdfOcrComponent
   ],
   providers: [
     provideHttpClient(withInterceptorsFromDi()), // استخدام provideHttpClient بدلاً من HttpClientModule

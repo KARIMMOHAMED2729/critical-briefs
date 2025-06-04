@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { HttpClient, HttpEventType, HttpResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-pdf-ocr',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FaIconComponent],
   templateUrl: './pdf-ocr.component.html',
   styleUrls: ['./pdf-ocr.component.css']
 })
@@ -16,6 +17,10 @@ export class PdfOcrComponent {
   errorMessage: string = '';
   successMessage: string = '';
 
+  uploading: boolean = false;
+  uploadProgress: number = 0;
+  uploadSuccess: boolean = false;
+
   constructor(private http: HttpClient) {}
 
   onFileSelected(event: any): void {
@@ -24,6 +29,9 @@ export class PdfOcrComponent {
     const file: File = event.target.files[0];
     if (file && file.type === 'application/pdf') {
       this.selectedFile = file;
+      this.uploading = false;
+      this.uploadProgress = 0;
+      this.uploadSuccess = false;
     } else {
       this.errorMessage = 'Please select a valid PDF file.';
       this.selectedFile = null;
@@ -39,19 +47,33 @@ export class PdfOcrComponent {
     this.errorMessage = '';
     this.successMessage = '';
     this.extractedText = '';
+    this.uploading = true;
+    this.uploadProgress = 0;
+    this.uploadSuccess = false;
 
     const formData = new FormData();
     formData.append('file', this.selectedFile);
 
-    this.http.post<{ text: string }>('/api/pdf-ocr/upload', formData).subscribe({
-      next: (response) => {
-        this.extractedText = response.text;
-        this.successMessage = 'Conversion completed successfully.';
-        this.isLoading = false;
+    this.http.post<{ text: string }>('/api/pdf-ocr/upload', formData, {
+      reportProgress: true,
+      observe: 'events'
+    }).subscribe({
+      next: (event) => {
+        if (event.type === HttpEventType.UploadProgress && event.total) {
+          this.uploadProgress = Math.round(100 * event.loaded / event.total);
+        } else if (event instanceof HttpResponse) {
+          this.extractedText = event.body?.text || '';
+          this.successMessage = 'Conversion completed successfully.';
+          this.isLoading = false;
+          this.uploading = false;
+          this.uploadSuccess = true;
+        }
       },
       error: (error) => {
         this.errorMessage = error.error?.message || 'An error occurred during conversion.';
         this.isLoading = false;
+        this.uploading = false;
+        this.uploadSuccess = false;
       }
     });
   }

@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpEventType } from '@angular/common/http';
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from '../../auth/auth.service';
 import { Router } from '@angular/router';
-import { DataService } from '../services/data.service';
+import { DataService } from '../../services/data.service';
 import { take } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
-import { NotificationService } from '../services/notification.service';
+import { environment } from '../../../environments/environment';
+import { NotificationService } from '../../services/notification.service';
 import * as XLSX from 'xlsx';
 
 interface Order {
@@ -98,7 +98,7 @@ export class AdminDashboardComponent implements OnInit {
   orders: GroupedOrder[] = [];
   requestedBooks: RequestedBook[] = [];
   isAdmin: boolean = false;
-  currentView: 'orders' | 'requestedBooks' | 'printOrders' | 'addProduct' | 'products' = 'orders';
+  currentView: 'orders' | 'requestedBooks' | 'printOrders' | 'addProduct' | 'products' | 'newPage' = 'orders';
 
   manualPromotionStartDate: string = '';
   manualPromotionEndDate: string = '';
@@ -192,7 +192,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  switchView(view: 'orders' | 'requestedBooks' | 'printOrders' | 'addProduct' | 'products'): void {
+  switchView(view: 'orders' | 'requestedBooks' | 'printOrders' | 'addProduct' | 'products' | 'newPage'): void {
     this.currentView = view;
     if (view === 'orders') {
       this.loadOrders();
@@ -202,6 +202,8 @@ export class AdminDashboardComponent implements OnInit {
       this.loadPrintOrders();
     } else if (view === 'products') {
       this.loadProducts();
+    } else if (view === 'newPage') {
+      // No data loading needed for newPage currently
     }
   }
 

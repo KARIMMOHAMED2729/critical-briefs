@@ -112,32 +112,32 @@ exports.uploadAndProcessPdf = (req, res) => {
         return res.status(400).json({ success: false, message: 'No file uploaded' });
       }
       const projectDir = path.dirname(file.path);
-      console.log('File uploaded to:', file.path);
-      console.log('Project directory:', projectDir);
+  // console.log('File uploaded to:', file.path);
+  // console.log('Project directory:', projectDir);
 
-      // Convert PDF pages to images
-      console.log('Starting PDF to images conversion');
-      const images = await convertPdfToImages(file.path, projectDir);
-      console.log('Images generated:', images);
+  // Convert PDF pages to images
+  // console.log('Starting PDF to images conversion');
+  const images = await convertPdfToImages(file.path, projectDir);
+  // console.log('Images generated:', images);
 
-      // Run OCR on images
-      console.log('Starting OCR on images');
-      let extractedText = await runOcrOnImages(images);
-      console.log('OCR completed');
+  // Run OCR on images
+  // console.log('Starting OCR on images');
+  let extractedText = await runOcrOnImages(images);
+  // console.log('OCR completed');
 
-      // Clean extracted text
-      extractedText = cleanText(extractedText);
-      console.log('Text cleaned');
+  // Clean extracted text
+  extractedText = cleanText(extractedText);
+  // console.log('Text cleaned');
 
-      // Save output.txt
-      const outputTxtPath = path.join(projectDir, 'output.txt');
-      fs.writeFileSync(outputTxtPath, extractedText, 'utf8');
-      console.log('Output text saved to:', outputTxtPath);
+  // Save output.txt
+  const outputTxtPath = path.join(projectDir, 'output.txt');
+  fs.writeFileSync(outputTxtPath, extractedText, 'utf8');
+  // console.log('Output text saved to:', outputTxtPath);
 
-      // Save output.epub
-      const outputEpubPath = path.join(projectDir, 'output.epub');
-      await generateEpub(outputEpubPath, extractedText);
-      console.log('Output epub saved to:', outputEpubPath);
+  // Save output.epub
+  const outputEpubPath = path.join(projectDir, 'output.epub');
+  await generateEpub(outputEpubPath, extractedText);
+  // console.log('Output epub saved to:', outputEpubPath);
 
       res.status(200).json({ success: true, text: extractedText });
     } catch (error) {

@@ -14,14 +14,13 @@ import { SearchResultsComponent } from './search-results/search-results.componen
 import { HomePageComponent } from './home-page/home-page.component';
 import { CartComponent } from './cart/cart.component';
 import { FavoritesComponent } from './favorites/favorites.component';
-import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { UserOrdersComponent } from './user-orders/user-orders.component';
 import { PrintComponent } from './print/print.component';
 import { BookDetailsComponent } from './book-details/book-details.component';
-import { PdfOcrComponent } from './pdf-ocr/pdf-ocr.component';
 
 
 const routes: Routes = [
@@ -45,7 +44,7 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'requests', component: UserOrdersComponent },
   { path: 'print', component: PrintComponent },
-  { path: 'pdf-ocr', component: PdfOcrComponent },
+  { path: 'pdf-ocr', loadComponent: () => import('./admin/pdf-ocr/pdf-ocr.component').then(m => m.PdfOcrComponent) },
   { path: '**', component: NotFoundComponent }
 ];
 

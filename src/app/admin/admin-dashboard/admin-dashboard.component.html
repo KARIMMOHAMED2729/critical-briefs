@@ -16,6 +16,9 @@
   <button (click)="switchView('products')" [class.bg-blue-600]="currentView === 'products'" class="px-4 py-2 rounded text-white bg-blue-400 hover:bg-blue-600 transition">
     عرض وتعديل المنتجات
   </button>
+  <button (click)="switchView('newPage')" [class.bg-blue-600]="currentView === 'newPage'" class="px-4 py-2 rounded text-white bg-blue-400 hover:bg-blue-600 transition">
+pdf الي epub
+  </button>
 </div>
 
 <div class="promotion-date-controls my-6 max-w-md mx-auto p-4 border rounded bg-gray-50 dark:bg-gray-800">
@@ -336,6 +339,10 @@
       <div>تم الرفع بنجاح!</div>
     </div>
   </div>
+</div>
+
+<div *ngIf="currentView === 'newPage'" class="max-w-4xl mx-auto p-6 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-900">
+  <app-pdf-ocr></app-pdf-ocr>
 </div>
 
 <!-- عرض الطلبات -->

@@ -3044,4 +3044,10 @@
           <priority>0.8</priority>
         </url>
       
+        <url>
+          <loc>http://localhost:3000/book/زاد-المعاد-في-هدي-خير-العباد</loc>
+          <changefreq>weekly</changefreq>
+          <priority>0.8</priority>
+        </url>
+      
 </urlset>
