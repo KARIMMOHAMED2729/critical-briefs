@@ -21,11 +21,12 @@ import { RegisterComponent } from './auth/register/register.component';
 import { UserOrdersComponent } from './user-orders/user-orders.component';
 import { PrintComponent } from './print/print.component';
 import { BookDetailsComponent } from './book-details/book-details.component';
+import { PdfOcrComponent } from './pdf-ocr/pdf-ocr.component';
 
 
 const routes: Routes = [
   { path: 'Home', component: HomePageComponent },
-  { path: 'Business-Marketing-Finance', component: AamalComponent },
+  { path: 'Business-Marketing-Finance', component: ChildComponent },
   { path: 'Education-children', component: ChildComponent },
   { path: 'Arts-crafts', component: FenonComponent },
   { path: 'HealthMedicineScience', component: FitComponent },
@@ -44,6 +45,7 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'requests', component: UserOrdersComponent },
   { path: 'print', component: PrintComponent },
+  { path: 'pdf-ocr', component: PdfOcrComponent },
   { path: '**', component: NotFoundComponent }
 ];
 

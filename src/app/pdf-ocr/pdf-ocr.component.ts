@@ -1,0 +1,86 @@
+import { Component } from '@angular/core';
+import { HttpClient, HttpEventType, HttpResponse } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-pdf-ocr',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './pdf-ocr.component.html',
+  styleUrls: ['./pdf-ocr.component.css']
+})
+export class PdfOcrComponent {
+  selectedFile: File | null = null;
+  extractedText: string = '';
+  isLoading: boolean = false;
+  errorMessage: string = '';
+  successMessage: string = '';
+
+  constructor(private http: HttpClient) {}
+
+  onFileSelected(event: any): void {
+    this.errorMessage = '';
+    this.successMessage = '';
+    const file: File = event.target.files[0];
+    if (file && file.type === 'application/pdf') {
+      this.selectedFile = file;
+    } else {
+      this.errorMessage = 'Please select a valid PDF file.';
+      this.selectedFile = null;
+    }
+  }
+
+  onConvert(): void {
+    if (!this.selectedFile) {
+      this.errorMessage = 'No PDF file selected.';
+      return;
+    }
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.extractedText = '';
+
+    const formData = new FormData();
+    formData.append('file', this.selectedFile);
+
+    this.http.post<{ text: string }>('/api/pdf-ocr/upload', formData).subscribe({
+      next: (response) => {
+        this.extractedText = response.text;
+        this.successMessage = 'Conversion completed successfully.';
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.errorMessage = error.error?.message || 'An error occurred during conversion.';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  downloadTxt(): void {
+    if (!this.extractedText) return;
+    const blob = new Blob([this.extractedText], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'output.txt';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  downloadEpub(): void {
+    // For simplicity, download the text as .epub with basic formatting
+    if (!this.extractedText) return;
+    const epubContent = `<?xml version="1.0" encoding="UTF-8"?>
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head><title>Output</title></head>
+    <body><pre>${this.extractedText}</pre></body>
+    </html>`;
+    const blob = new Blob([epubContent], { type: 'application/epub+zip' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'output.epub';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+}
