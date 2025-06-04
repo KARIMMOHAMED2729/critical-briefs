@@ -8,6 +8,8 @@ const Epub = require('epub-gen');
 
 const uploadsDir = path.join(__dirname, '../uploads/');
 
+const outputJsonPath = path.join(__dirname, '../output.json');
+
 // Multer storage configuration for saving uploaded PDFs in a project-specific folder
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -23,7 +25,9 @@ const storage = multer.diskStorage({
     cb(null, projectDir);
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
+    // Use the original filename as is (which is renamed by frontend)
+    const originalName = Buffer.from(file.originalname, 'latin1').toString('utf8'); // تحويل الاسم إلى UTF-8
+    cb(null, originalName);
   }
 });
 
@@ -36,7 +40,10 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({ storage: storage, fileFilter: fileFilter }).single('file');
+const upload = multer({ storage: storage, fileFilter: fileFilter }).fields([
+  { name: 'file', maxCount: 1 },
+  { name: 'projectName', maxCount: 1 }
+]);
 
 // Helper function to convert PDF pages to images using pdf-poppler (requires poppler-utils installed)
 function convertPdfToImages(pdfPath, outputDir) {
@@ -106,7 +113,7 @@ exports.uploadAndProcessPdf = (req, res) => {
       return res.status(400).json({ success: false, message: err.message });
     }
     try {
-      const file = req.file;
+      const file = req.files['file'] ? req.files['file'][0] : null;
       if (!file) {
         console.error('No file uploaded');
         return res.status(400).json({ success: false, message: 'No file uploaded' });
@@ -130,12 +137,13 @@ exports.uploadAndProcessPdf = (req, res) => {
   // console.log('Text cleaned');
 
   // Save output.txt
-  const outputTxtPath = path.join(projectDir, 'output.txt');
+  const baseName = path.basename(file.filename, path.extname(file.filename));
+  const outputTxtPath = path.join(projectDir, `${baseName}.txt`);
   fs.writeFileSync(outputTxtPath, extractedText, 'utf8');
   // console.log('Output text saved to:', outputTxtPath);
 
   // Save output.epub
-  const outputEpubPath = path.join(projectDir, 'output.epub');
+  const outputEpubPath = path.join(projectDir, `${baseName}.epub`);
   await generateEpub(outputEpubPath, extractedText);
   // console.log('Output epub saved to:', outputEpubPath);
 
@@ -143,6 +151,23 @@ exports.uploadAndProcessPdf = (req, res) => {
     } catch (error) {
       console.error('Processing error:', error);
       res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+  });
+};
+
+exports.getBookNames = (req, res) => {
+  fs.readFile(outputJsonPath, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading output.json:', err);
+      return res.status(500).json({ success: false, message: 'Failed to read book names' });
+    }
+    try {
+      const books = JSON.parse(data);
+      const bookNames = books.map(book => book.product_name);
+      res.status(200).json({ success: true, bookNames });
+    } catch (parseError) {
+      console.error('Error parsing output.json:', parseError);
+      res.status(500).json({ success: false, message: 'Failed to parse book names' });
     }
   });
 };

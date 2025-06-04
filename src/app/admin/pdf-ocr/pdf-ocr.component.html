@@ -1,9 +1,24 @@
 <div class="max-w-4xl mx-auto p-6 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-900">
   <h2 class="text-center text-2xl font-semibold mb-6 text-gray-800 dark:text-gray-200">PDF OCR Converter</h2>
 
+  <label for="bookName" class="block mb-2 font-semibold text-gray-700 dark:text-gray-300">Select Book Name:</label>
+<div class="mb-4">
+  <input
+    type="text"
+    placeholder="ابحث عن اسم كتاب"
+    [(ngModel)]="selectedBookName"
+    (input)="filterBookNames()"
+    class="block w-full p-2 border border-gray-300 rounded dark:bg-gray-800 dark:text-gray-200"
+    list="bookNamesList"
+  />
+  <datalist id="bookNamesList">
+    <option *ngFor="let name of filteredBookNames" [value]="name"></option>
+  </datalist>
+</div>
+
   <input type="file" accept="application/pdf" (change)="onFileSelected($event)" class="block mb-4 w-full text-gray-700 dark:text-gray-300" />
   
-  <button (click)="onConvert()" [disabled]="!selectedFile || isLoading" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+  <button (click)="onConvert()" [disabled]="!selectedFile || !selectedBookName || isLoading" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
     {{ isLoading ? 'Converting...' : 'Convert' }}
   </button>
 

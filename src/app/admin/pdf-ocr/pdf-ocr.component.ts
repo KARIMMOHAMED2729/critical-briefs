@@ -1,16 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpEventType, HttpResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-pdf-ocr',
   standalone: true,
-  imports: [CommonModule, FaIconComponent],
+  imports: [CommonModule, FaIconComponent,FormsModule],
   templateUrl: './pdf-ocr.component.html',
   styleUrls: ['./pdf-ocr.component.css']
 })
-export class PdfOcrComponent {
+export class PdfOcrComponent implements OnInit {
+  bookNames: string[] = [];
+  filteredBookNames: string[] = [];
+  selectedBookName: string = '';
   selectedFile: File | null = null;
   extractedText: string = '';
   isLoading: boolean = false;
@@ -22,6 +26,32 @@ export class PdfOcrComponent {
   uploadSuccess: boolean = false;
 
   constructor(private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.loadBookNames();
+  }
+
+  loadBookNames(): void {
+    this.http.get<{ success: boolean; bookNames: string[] }>('/api/pdf-ocr/book-names').subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.bookNames = res.bookNames;
+          this.filteredBookNames = [...this.bookNames];
+        }
+      },
+      error: (err) => {
+        this.showNotification('Failed to load book names', 'error');
+      }
+    });
+  }
+
+  filterBookNames(): void {
+    const filterValue = this.selectedBookName.toLowerCase();
+    this.filteredBookNames = this.bookNames.filter(name =>
+      name.toLowerCase().includes(filterValue)
+    );
+  }
+
 
   onFileSelected(event: any): void {
     this.errorMessage = '';
@@ -38,9 +68,14 @@ export class PdfOcrComponent {
     }
   }
 
+
   onConvert(): void {
     if (!this.selectedFile) {
       this.errorMessage = 'No PDF file selected.';
+      return;
+    }
+    if (!this.selectedBookName) {
+      this.errorMessage = 'Please select a book name.';
       return;
     }
     this.isLoading = true;
@@ -51,8 +86,12 @@ export class PdfOcrComponent {
     this.uploadProgress = 0;
     this.uploadSuccess = false;
 
+    // Rename the file to selectedBookName.pdf before upload
+    const renamedFile = new File([this.selectedFile], `${this.selectedBookName}.pdf`, { type: 'application/pdf' });
+
     const formData = new FormData();
-    formData.append('file', this.selectedFile);
+    formData.append('file', renamedFile);
+    formData.append('projectName', this.selectedBookName);
 
     this.http.post<{ text: string }>('/api/pdf-ocr/upload', formData, {
       reportProgress: true,
@@ -78,6 +117,7 @@ export class PdfOcrComponent {
     });
   }
 
+
   downloadTxt(): void {
     if (!this.extractedText) return;
     const blob = new Blob([this.extractedText], { type: 'text/plain' });
@@ -88,6 +128,7 @@ export class PdfOcrComponent {
     a.click();
     window.URL.revokeObjectURL(url);
   }
+
 
   downloadEpub(): void {
     // For simplicity, download the text as .epub with basic formatting
@@ -104,5 +145,19 @@ export class PdfOcrComponent {
     a.download = 'output.epub';
     a.click();
     window.URL.revokeObjectURL(url);
+  }
+
+  showNotification(message: string, type: 'success' | 'error'): void {
+    if (type === 'success') {
+      this.successMessage = message;
+      this.errorMessage = '';
+    } else {
+      this.errorMessage = message;
+      this.successMessage = '';
+    }
+    setTimeout(() => {
+      this.errorMessage = '';
+      this.successMessage = '';
+    }, 5000);
   }
 }
