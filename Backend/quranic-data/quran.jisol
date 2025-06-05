@@ -1,0 +1,15 @@
+{
+  "name": "Quranic Mushaf JISOL",
+  "description": "Sample JISOL file for Quranic script to improve OCR recognition of Quranic ayat.",
+  "characters": [
+    "ا", "ب", "ت", "ث", "ج", "ح", "خ", "د", "ذ", "ر", "ز", "س", "ش", "ص", "ض",
+    "ط", "ظ", "ع", "غ", "ف", "ق", "ك", "ل", "م", "ن", "ه", "و", "ي", "ء", "آ",
+    "أ", "إ", "ؤ", "ئ", "لا", "ى", "ة", "ۖ", "ۗ", "ۘ", "ۙ", "ۚ", "ۛ", "ۜ", "۝"
+  ],
+  "ligatures": [
+    "لا", "لآ", "لأ", "لإ"
+  ],
+  "diacritics": [
+    "َ", "ً", "ُ", "ٌ", "ِ", "ٍ", "ْ", "ّ"
+  ]
+}
