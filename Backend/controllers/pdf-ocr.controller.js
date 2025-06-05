@@ -166,7 +166,6 @@ async function runOcrOnImages(images) {
 
   for (let i = 0; i < images.length; i++) {
     const imagePath = images[i];
-    console.log(`Processing image ${i + 1}/${images.length}: ${path.basename(imagePath)}`);
     try {
       const { data: { text } } = await worker.recognize(imagePath);
       fullText += text + '\n\n'; // Add double newline between pages for paragraph separation
@@ -182,7 +181,6 @@ async function runOcrOnImages(images) {
 
 // Helper function to generate EPUB
 function generateEpub(outputPath, text, title) {
-  console.log(`Generating EPUB: ${outputPath}`);
   const option = {
     title: title || "OCR Output",
     author: "PDF OCR System",
