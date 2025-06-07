@@ -1,0 +1,186 @@
+<div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 overflow-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl ">
+      <h2 class="text-2xl font-bold mb-4 pt-10 text-gray-900 dark:text-gray-200">إتمام عملية الشراء</h2>
+      
+      <div class="mb-6 max-h-96 overflow-y-auto">
+        <div *ngFor="let item of cartItems" class="flex items-center justify-between py-3 border-b border-gray-300 dark:border-gray-700">
+          <div class="flex items-center">
+            <div class="w-16 h-16 rounded mr-4 overflow-hidden flex items-center justify-center bg-gray-100 dark:bg-gray-700">
+              <img [src]="uploadsBaseUrl + '/' + item.product_image + '.jpg'" 
+                   class="max-w-full max-h-full object-contain"
+                   (error)="handleImageError($event)">
+            </div>
+            <div class="flex-1">
+              <h3 class="font-medium text-gray-800 dark:text-gray-200">{{item.product_name}}</h3>
+              <p class="text-gray-600 dark:text-gray-400 font-medium">{{item.product_price}} EGP</p>
+              
+              <div *ngIf="item.product_quantity <= 0" class="relative opacity-50 grayscale">
+                <div class="absolute inset-0 flex items-center pointer-events-none">
+                  <div class="w-full border-t-2 border-red-400 border-dashed"></div>
+                </div>
+                <div class="mt-2 p-2 bg-red-50 dark:bg-red-900 rounded-lg relative">
+                  <p class="text-red-600 dark:text-red-400 text-sm flex items-center">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <span>
+                      هذا الكتاب غير متوفر حالياً<br>
+                      <span class="text-gray-500 dark:text-gray-400 text-xs">متوقع توافره خلال 3-5 أيام عمل</span>
+                    </span>
+                  </p>
+                </div>
+              </div>
+              
+              <div *ngIf="item.product_quantity > 0" class="flex items-center mt-3 space-x-2">
+                <button (click)="decreaseQuantity(item)" 
+                        class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 w-8 h-8 flex items-center justify-center rounded-full 
+                               transition-colors duration-200 border border-gray-200 dark:border-gray-600">
+                  -
+                </button>
+                <span class="w-8 text-center font-medium text-gray-900 dark:text-gray-200">{{item.quantity || 1}}</span>
+                <button (click)="increaseQuantity(item)" 
+                        class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 w-8 h-8 flex items-center justify-center rounded-full 
+                               transition-colors duration-200 border border-gray-200 dark:border-gray-600">
+                  +
+                </button>
+                <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">(المتاح: {{item.product_quantity}})</span>
+              </div>
+              <div *ngIf="item.showMessage" 
+                   class="mt-1 px-2 py-1 bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-400 text-xs rounded animate-pulse">
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                {{item.message}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+  <!-- عرض عنوان ورقم الهاتف بشكل مشابه لمكون إنشاء حساب مع إمكانية التعديل -->
+  <div class="mb-4" *ngIf="userProfile">
+    <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-gray-200">عنوانك ورقم هاتفك</h3>
+    <div *ngIf="!isEditingAddress" class="mb-2">
+      <div class="flex space-x-4 mb-2">
+        <div class="flex-1">
+          <label class="block mb-1 text-sm font-medium text-gray-900 dark:text-gray-300">المحافظة</label>
+          <input type="text" [value]="userProfile.governorate" disabled
+                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 cursor-not-allowed text-gray-900 dark:text-gray-200" />
+        </div>
+        <div class="flex-1">
+          <label class="block mb-1 text-sm font-medium text-gray-900 dark:text-gray-300">المدينة</label>
+          <input type="text" [value]="userProfile.city" disabled
+                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 cursor-not-allowed text-gray-900 dark:text-gray-200" />
+        </div>
+        <div class="flex-1">
+          <label class="block mb-1 text-sm font-medium text-gray-900 dark:text-gray-300">تفاصيل العنوان</label>
+          <input type="text" [value]="userProfile.village" disabled
+                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 cursor-not-allowed text-gray-900 dark:text-gray-200" />
+        </div>
+      </div>
+      <div class="mb-2">
+        <label class="block mb-1 text-sm font-medium text-gray-900 dark:text-gray-300">رقم الهاتف</label>
+        <input type="text" [value]="userProfile.phone" disabled
+               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 cursor-not-allowed text-gray-900 dark:text-gray-200" />
+      </div>
+      <label class="flex items-center mt-2 text-gray-900 dark:text-gray-200 relative">
+        <input type="checkbox" [(ngModel)]="isAddressConfirmed" class="mr-2" />
+        <span>حدد هذا الخيار إذا كنت متأكدًا من المعلومات</span>
+        <fa-icon [icon]="faHandPointLeft" class="ml-2 animate-hand-pointing text-blue-600 dark:text-yellow-400"></fa-icon>
+      </label>
+      <button
+        *ngIf="!isAddressConfirmed"
+        (click)="onEditAddress()"
+        class="mt-2 bg-blue-500 dark:bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors"
+      >
+        تعديل البيانات ورقم الهاتف
+      </button>
+    </div>
+    <div *ngIf="isEditingAddress && editedUserProfile" class="mb-2">
+      <div class="flex space-x-4 mb-2">
+        <div class="flex-1">
+          <label class="block mb-1 text-sm font-medium text-gray-900 dark:text-gray-300">المحافظة</label>
+          <input list="governoratesList" type="text" [(ngModel)]="editedUserProfile.governorate" (change)="onGovernorateChange()"
+                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200" />
+          <datalist id="governoratesList">
+            <option *ngFor="let gov of governorates" [value]="gov.governorate_name"></option>
+          </datalist>
+        </div>
+        <div class="flex-1">
+          <label class="block mb-1 text-sm font-medium text-gray-900 dark:text-gray-300">المدينة</label>
+          <input list="citiesList" type="text" [(ngModel)]="editedUserProfile.city"
+                 (input)="validateLocation()"
+                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200" />
+          <datalist id="citiesList">
+            <option *ngFor="let city of cities" [value]="city"></option>
+          </datalist>
+        </div>
+        <div class="flex-1">
+          <label class="block mb-1 text-sm font-medium text-gray-900 dark:text-gray-300">تفاصيل العنوان</label>
+          <input type="text" [(ngModel)]="editedUserProfile.village"
+                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200" />
+        </div>
+      </div>
+        <div class="mb-2">
+          <label class="block mb-1 text-sm font-medium text-gray-900 dark:text-gray-300">رقم الهاتف</label>
+          <input type="text" [(ngModel)]="editedUserProfile.phone"
+                 (input)="validatePhone()"
+                 [ngClass]="{
+                   'border-blue-500 focus:ring-blue-500': phoneValid && phoneTouched,
+                   'border-red-500 focus:ring-red-500': !phoneValid && phoneTouched
+                 }"
+                 class="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200" />
+          <div *ngIf="!phoneValid && phoneTouched" class="text-red-500 dark:text-red-400 text-sm mt-1">
+            ❌ رقم الهاتف غير صالح. يجب أن يبدأ بـ 010 أو 011 أو 012 أو 015 ويحتوي على 11 رقمًا.
+          </div>
+          <div *ngIf="phoneValid && phoneTouched" class="text-blue-500 dark:text-blue-400 text-sm mt-1">
+            ✔️ رقم الهاتف صحيح!
+          </div>
+        </div>
+      <div class="flex space-x-4">
+        <button (click)="saveEditAddress()"
+                [disabled]="!phoneValid || !phoneTouched || !locationValid"
+                class="bg-green-600 dark:bg-green-700 text-white py-2 px-4 rounded hover:bg-green-700 dark:hover:bg-green-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          حفظ
+        </button>
+        <button (click)="cancelEditAddress()"
+                class="bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 py-2 px-4 rounded hover:bg-gray-400 dark:hover:bg-gray-700 transition-colors">
+          إلغاء
+        </button>
+      </div>
+    </div>
+  
+      <div class="border-t border-gray-300 dark:border-gray-700 pt-4">
+        <div class="flex justify-between mb-2">
+          <span class="text-gray-900 dark:text-gray-200">تكلفة الشحن:</span>
+          <span class="text-gray-900 dark:text-gray-200">{{shippingCost}} EGP</span>
+        </div>
+        <div class="text-sm text-green-600 dark:text-green-400 mb-2 flex items-center space-x-2 rtl:space-x-reverse">
+          <fa-icon [icon]="faCheck" class="text-green-600 dark:text-green-400"></fa-icon>
+          <span>{{ freeShippingMessage }}</span>
+        </div>
+        <div class="flex justify-between mb-4">
+          <span class="font-bold text-gray-900 dark:text-gray-200">المجموع:</span>
+          <span class="font-bold text-gray-900 dark:text-gray-200">{{totalPrice}} EGP</span>
+        </div>
+  
+        <div class="grid grid-cols-2 gap-4 relative z-10">
+          <button (click)="onClose()" 
+                  class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 py-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+            إلغاء
+          </button>
+  <button (click)="completePurchase()" 
+          [disabled]="!hasPurchasableItems || !isAddressConfirmed || !isAddressComplete"
+          class="bg-blue-600 text-white py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors relative z-20 disabled:bg-gray-400 disabled:cursor-not-allowed">
+    إتمام الشراء
+  </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- رسالة النجاح -->
+  <div *ngIf="showSuccessMessage" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full mx-4 text-center animate__animated animate__bounceIn">
+      <div class="text-6xl mb-4">🎉</div>
+      <h3 class="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">تمت عملية الشراء بنجاح!</h3>
+      <p class="text-gray-600 dark:text-gray-400 mb-6">📚 سيتم تحديث سلة التسوق تلقائياً</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,134 @@
+<!-- Promotional Carousel -->
+<div class="relative w-screen pt-40 overflow-hidden h-[450px] sm:h-[550px] md:h-[700px] mb-8">
+  <div class="w-full h-full relative bg-white dark:bg-gray-800">
+    <img
+      *ngFor="let img of promoImages; let i = index"
+      [src]="img"
+      alt="Promotional Image"
+      class="bg-white dark:bg-gray-800 absolute top-0 left-0 w-full h-full transition-opacity duration-1000 object-cover"
+      [style.opacity]="promoCurrentIndex === i ? '1' : '0'"
+      style="object-position: top;"
+    />
+  </div>
+  <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+    <button
+      *ngFor="let img of promoImages; let i = index"
+      (click)="setPromoIndex(i)"
+      class="w-3 h-3 rounded-full"
+      [ngClass]="promoCurrentIndex === i ? 'bg-yellow-400' : 'bg-gray-300'"
+      attr.aria-label="Select promotional image {{i + 1}}"
+    ></button>
+  </div>
+</div>
+<!-- وصل حديثاً -->
+<div class="h-[480px] pt-4 overflow-hidden">
+  <h1 class="text-2xl font-bold text-center mb-4">وصل حديثاً</h1>
+
+  <div class="relative w-full mx-auto overflow-hidden"
+  (mouseenter)="isHovered = true"
+  (mouseleave)="isHovered = false"
+  (touchstart)="onTouchStart($event)"
+  (touchmove)="onTouchMove($event)"
+  (touchend)="onTouchEnd()"
+  >
+<!-- زر السابق -->
+<button 
+  (click)="scrollPrev()" 
+  class="absolute left-2 top-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-full shadow dark:shadow-lg w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 z-10">
+  <fa-icon [icon]="faChevronLeft" class="text-gray-700 dark:text-gray-300 text-lg"></fa-icon>
+</button>
+
+<!-- زر التالي -->
+<button 
+  (click)="scrollNext()" 
+  class="absolute right-2 top-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-full shadow dark:shadow-lg w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 z-10">
+  <fa-icon [icon]="faChevronRight" class="text-gray-700 dark:text-gray-300 text-lg"></fa-icon>
+</button>
+
+    <div
+  class="flex carousel-track transition-transform duration-700 ease-in-out"
+  [style.transform]="transformStyle"
+>
+
+      <div
+        *ngFor="let book of visibleBooks"
+        class="w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5 p-2 shrink-0"
+      >
+         <!-- صورة الكتاب -->
+      <div [routerLink]="['/book', getBookSlug(book.product_name)]"
+      class="relative w-full h-full bg-cover bg-center rounded-lg shadow-lg dark:shadow-black/50 hover:contrast-75 cursor-pointer overflow-hidden">
+    <img [routerLink]="['/book', getBookSlug(book.product_name)]"
+      [src]="uploadsBaseUrl + '/' + book.product_image + '.jpg'" 
+      (error)="handleImageError($event)"
+      [alt]="book.product_name" 
+      class="rounded-lg w-full h-[300px] cursor-pointer bg-cover"
+    />
+    <!-- <h2
+    class="bg-amber-800 text-white p-2 absolute top-0 right-0 text-[10px] sm:text-sm"
+  >
+    {{ book.product_name }}
+  </h2> -->
+      </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+
+<!-- اقسام المكتبه -->
+<h1 class="mb-10">أمثلة على الشكل النهائي لخدمة الطباعة</h1>
+<div class="grid md:flex justify-around gap-8 mb-12 px-4">
+  <div
+    class="print-image-container"
+    *ngFor="let img of printImages; let i = index"
+    (mousedown)="startDrag($event, i)"
+    (mouseup)="stopDrag(i)"
+    (mouseleave)="stopDrag(i)"
+    (mousemove)="onDrag($event, i)"
+    (touchstart)="startDrag($event, i)"
+    (touchend)="stopDrag(i)"
+    (touchcancel)="stopDrag(i)"
+    (touchmove)="onDrag($event, i)"
+  >
+    <div class="rotating-dashed-rays"></div>
+    <div class="print-image-shadow"></div>
+    <img
+      [src]="img"
+      alt="Print example {{ i + 1 }}"
+      class="print-image w-[150px] sm:w-[180px] md:w-[220px]"
+      [style.transform]="printImageTransforms[i]"
+      draggable="false"
+    />
+      <div class="book-cover-title text-center mt-2 font-bold text-lg text-gray-800 dark:text-gray-200">
+    {{ printImageTitles[i] }}
+  </div>
+  </div>
+</div>
+
+<h1 class="mb-10">أقسام المكتبة</h1>
+<div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-4 mb-6">
+    <div
+    *ngFor="let category of categories; let i = index"
+    class="relative group h-32 rounded-xl overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer fade-in"
+    [style.animationDelay]="i * 200 + 'ms'"
+    >
+    <a
+    [routerLink]="['/', category.id]"
+    class="relative group h-32 rounded-xl overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer block"
+  >
+    <img
+      [src]="category.image"
+      alt="{{ category.name }}"
+      class="w-full h-full object-cover brightness-75 group-hover:brightness-50 transition duration-300"
+    />
+    <div
+      class="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/60 transition duration-300"
+    >
+      <h2 class="text-white text-lg sm:text-xl font-semibold tracking-wide drop-shadow-md">
+        {{ category.name }}
+      </h2>
+    </div>
+  </a>
+      </div>
+    </div>

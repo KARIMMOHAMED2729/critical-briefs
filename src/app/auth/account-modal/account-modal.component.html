@@ -1,0 +1,53 @@
+<div *ngIf="show" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+  <div class="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-6 w-full max-w-sm text-center border border-gray-200 dark:border-gray-700 relative animate-fade-in">
+    <h3 class="text-gray-800 dark:text-gray-200 font-bold text-lg mb-4">أهلاً بك في مكتبة كنوز 📚</h3>
+
+    <!-- إذا كان المستخدم مسجلاً للدخول -->
+    <div *ngIf="isLoggedIn; else loggedOut" class="">
+      <p class="rtl text-gray-800 dark:text-gray-300 mb-2">
+        <fa-icon [icon]="faUserCircle" class="text-gray-600 dark:text-gray-400 mr-2"></fa-icon>
+        مرحباً {{ user.username }}
+      </p>
+      <p class="rtl text-gray-600 dark:text-gray-400 mb-4">
+        <fa-icon [icon]="faEnvelope" class="text-gray-600 dark:text-gray-400 mr-2"></fa-icon>
+        {{ user.email }}
+      </p>
+      <p class="rtl text-gray-600 dark:text-gray-400 mb-4">
+        <fa-icon [icon]="faPhoneAlt" class="text-gray-600 dark:text-gray-400 mr-2"></fa-icon>
+        {{ user.phone }}
+      </p>
+      <button
+        (click)="logout()"
+        class="w-full mb-3 py-2 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 transition"
+      >
+        <fa-icon [icon]="faSignOutAlt" class="mr-2"></fa-icon> تسجيل الخروج
+      </button>
+    </div>
+
+    <!-- إذا لم يكن المستخدم مسجلاً للدخول -->
+    <ng-template #loggedOut>
+      <button
+        (click)="goToLogin()"
+        class="w-full mb-3 py-2 bg-blue-600  text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition"
+      >
+        <fa-icon [icon]="faSignInAlt" class="mr-2"></fa-icon> تسجيل الدخول
+      </button>
+
+      <button
+        (click)="goToRegister()"
+        class="w-full py-2 border border-blue-600 dark:border-blue-700 text-blue-600 dark:text-blue-400 rounded hover:bg-blue-50 dark:hover:bg-blue-900 transition"
+      >
+        <fa-icon [icon]="faUserPlus" class="mr-2"></fa-icon> إنشاء حساب
+      </button>
+    </ng-template>
+
+    <!-- زر إغلاق -->
+    <button
+      (click)="closeModal()"
+      class="absolute top-2 left-2 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-600 text-xl"
+      title="إغلاق"
+    >
+      &times;
+    </button>
+  </div>
+</div>

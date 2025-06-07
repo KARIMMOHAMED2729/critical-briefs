@@ -1,0 +1,11 @@
+.out{
+  transform: translateX(20px);
+  transition: all ease-out .5s;
+}
+.on{
+  transform: translateX(-40px);
+  transition: all ease-out .5s;
+}
+.link{
+  transform: translate(0%,-50%);
+}
