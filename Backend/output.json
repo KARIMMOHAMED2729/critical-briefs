@@ -5463,19 +5463,6 @@
     "product_discount_percent": 70
   },
   {
-    "products_id": "159",
-    "product_name": "فاتتني صلاة",
-    "product_price": 59,
-    "price_cost": "35",
-    "product_quantity": "1",
-    "product_category": "كتب دينية",
-    "product_image": "159",
-    "promotionEndDate": "2025-06-10T00:00:00.000Z",
-    "product_price_before_discount": 169,
-    "rival": true,
-    "product_discount_percent": 70
-  },
-  {
     "products_id": "558",
     "product_name": "مكتبة الصفا",
     "product_price": 569,
@@ -6084,19 +6071,6 @@
     "product_quantity": 1,
     "product_category": "روايات وقصص",
     "product_image": 724,
-    "promotionEndDate": "2025-06-10T00:00:00.000Z",
-    "product_price_before_discount": 219,
-    "rival": true,
-    "product_discount_percent": 65
-  },
-  {
-    "products_id": 159,
-    "product_name": "ازمة تعلق",
-    "product_price": 79,
-    "price_cost": 45,
-    "product_quantity": 1,
-    "product_category": "تطوير الذات وعلم النفس",
-    "product_image": 159,
     "promotionEndDate": "2025-06-10T00:00:00.000Z",
     "product_price_before_discount": 219,
     "rival": true,
@@ -6873,6 +6847,48 @@
     "product_image": "705432807096",
     "promotionEndDate": "2025-06-10T00:00:00.000Z",
     "product_price_before_discount": 1569,
+    "rival": true,
+    "product_discount_percent": 65
+  },
+  {
+    "products_id": "982846935429",
+    "product_name": "ازمة تعلق",
+    "product_price": 69,
+    "price_cost": 40,
+    "product_quantity": 1,
+    "product_category": "تطوير الذات وعلم النفس",
+    "product_description": "كتاب \"أزمة تعلق: أنماط التعلق والعلاقات الحميمية\" يقدم نظرة عامة على نظرية التعلق، وأنماطها المختلفة وتأثيرها على العلاقات الحميمية. الكتاب يهدف إلى مساعدة القارئ على فهم أنفسهم وفهم الآخرين، مما يتيح لهم بناء علاقات صحية وقوية. ",
+    "product_image": "982846935429",
+    "promotionEndDate": "2025-06-10T00:00:00.000Z",
+    "product_price_before_discount": 189,
+    "rival": true,
+    "product_discount_percent": 65
+  },
+  {
+    "products_id": "915226667149",
+    "product_name": "فاتتني صلاة",
+    "product_price": 59,
+    "price_cost": 35,
+    "product_quantity": 1,
+    "product_category": "كتب دينية",
+    "product_description": "كتاب \"فاتتني صلاة\" للكاتب إسلام جمال هو كتاب ديني يركز على أهمية الصلاة ويحث القراء على الحفاظ عليها وعدم تفويتها. يتناول الكتاب الصلاة من جوانب مختلفة، ويطرح أسئلة حول سبب اهتمام بعض الأشخاص بالصلاة بينما يتركها البعض الآخر. كما يسلط الكتاب الضوء على فوائد الصلاة البدنية والنفسية. ",
+    "product_image": "915226667149",
+    "promotionEndDate": "2025-06-10T00:00:00.000Z",
+    "product_price_before_discount": 169,
+    "rival": true,
+    "product_discount_percent": 70
+  },
+  {
+    "products_id": "099453442235",
+    "product_name": "الجريمة والعقاب",
+    "product_price": 199,
+    "price_cost": 130,
+    "product_quantity": 1,
+    "product_category": "روايات وقصص",
+    "product_description": "\"الجريمة والعقاب\" رواية روائية فلسفية لفيودور دوستويفسكي، تدور حول الشاب روديون راسكولينكوف الذي يرتكب جريمة قتل بسبب ظروفه الاجتماعية وأفكاره الفلسفية. الرواية تستكشف الصراع الداخلي للشخصية، وتطرح أسئلة عن الأخلاق، العدالة، والتوبة. ",
+    "product_image": "099453442235",
+    "promotionEndDate": "2025-06-10T00:00:00.000Z",
+    "product_price_before_discount": 549,
     "rival": true,
     "product_discount_percent": 65
   }
