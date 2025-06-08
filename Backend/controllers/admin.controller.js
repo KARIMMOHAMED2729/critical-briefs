@@ -99,7 +99,7 @@ async function addProduct(req, res) {
 
     // Update Excel file after product addition
     await updateExcelFromJson(process.env.GOOGLE_DRIVE_FILE_ID);
-    // Then update the update file
+    // Then update the update file to keep in sync
     await updateExcelFromJson(process.env.GOOGLE_DRIVE_FILE_update);
     // Removed second update to main file
     // await updateExcelFromJson(process.env.GOOGLE_DRIVE_FILE_ID);
@@ -120,8 +120,8 @@ async function addProduct(req, res) {
 // New API to list all products
 async function listProducts(req, res) {
   try {
-    // Use the same file ID as used for adding products to keep consistency
-    const products = await downloadAndConvertExcel(process.env.GOOGLE_DRIVE_FILE_update);
+    // Use the main file ID to update output.json and list products
+    const products = await downloadAndConvertExcel(process.env.GOOGLE_DRIVE_FILE_ID);
     // Do not map product_category back to short keys, send as is
     res.json({ success: true, products });
   } catch (error) {
@@ -479,8 +479,8 @@ async function getPromotionDates(req, res) {
     if (!promotionDate) {
       // If no promotion dates found, return default dates
       promotionDate = {
-        startDate: new Date('2025-05-11'),
-        endDate: new Date('2025-06-10')
+        startDate: new Date(),
+        endDate: new Date()
       };
     }
     res.json({
@@ -509,12 +509,12 @@ async function updatePromotionDates(req, res) {
       return res.status(400).json({ success: false, message: 'endDate must be after startDate' });
     }
 
-    // Save new promotion dates document
-    const newPromotionDate = new PromotionDate({
-      startDate: start,
-      endDate: end
-    });
-    await newPromotionDate.save();
+    // Atomically update the latest promotion date document or create if none exists
+    const promotionDateDoc = await PromotionDate.findOneAndUpdate(
+      {},
+      { startDate: start, endDate: end },
+      { sort: { createdAt: -1 }, upsert: true, new: true }
+    );
 
     // Update output.json by re-running downloadAndConvertExcel with new dates
     const fileId = process.env.GOOGLE_DRIVE_FILE_ID;

@@ -24,6 +24,25 @@ async function downloadAndConvertExcel(fileId, promotionStartDateStr, promotionE
   const client = await auth.getClient();
   const drive = google.drive({ version: 'v3', auth: client });
 
+  // Always fetch latest promotion dates from MongoDB
+  const PromotionDate = require('../models/PromotionDate.model');
+  let promotionStartDate;
+  let promoEndDate;
+  try {
+    const promotionDateDoc = await PromotionDate.findOne().sort({ createdAt: -1 }).exec();
+    if (promotionDateDoc) {
+      promotionStartDate = promotionDateDoc.startDate;
+      promoEndDate = promotionDateDoc.endDate;
+    } else {
+      promotionStartDate = new Date();
+      promoEndDate = new Date();
+    }
+  } catch (error) {
+    console.error('Error fetching promotion dates from MongoDB:', error);
+    promotionStartDate = new Date();
+    promoEndDate = new Date();
+  }
+
   const res = await drive.files.get({
     fileId,
     alt: 'media',
@@ -34,10 +53,6 @@ async function downloadAndConvertExcel(fileId, promotionStartDateStr, promotionE
   const sheetName = workbook.SheetNames[0];
   const sheet = workbook.Sheets[sheetName];
   let json = xlsx.utils.sheet_to_json(sheet);
-
-  // Use promotionStartDateStr and promotionEndDateStr if provided, else fallback to default dates
-  let promotionStartDate = promotionStartDateStr ? new Date(promotionStartDateStr) : new Date('2025-05-11');
-  let promoEndDate = promotionEndDateStr ? new Date(promotionEndDateStr) : new Date('2025-06-10');
 
   // Filter out products with product_quantity less than 0
   const filteredJson = json.filter(product => {
@@ -106,10 +121,10 @@ async function downloadAndConvertExcel(fileId, promotionStartDateStr, promotionE
     // Add rival property: true if in promotion period, else false
     const today = new Date();
     // Ensure promoEndDate is after promotionStartDate
-    if (promoEndDate <= promotionStartDate) {
+    if (promoEndDate.getTime() <= promotionStartDate.getTime()) {
       product.rival = false;
     } else {
-      product.rival = today >= promotionStartDate && today <= promoEndDate;
+      product.rival = today.getTime() >= promotionStartDate.getTime() && today.getTime() <= promoEndDate.getTime();
     }
 
     // If current date is within promotion period, discount price by dividing by 2.75

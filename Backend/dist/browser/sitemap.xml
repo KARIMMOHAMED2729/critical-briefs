@@ -735,7 +735,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/وهج-البنفسج</loc>
+          <loc>http://localhost:3000/book/2</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -1419,6 +1419,12 @@
         </url>
       
         <url>
+          <loc>http://localhost:3000/book/جامع-خلافات-الشيعة-والسنة</loc>
+          <changefreq>weekly</changefreq>
+          <priority>0.8</priority>
+        </url>
+      
+        <url>
           <loc>http://localhost:3000/book/لطائف-المعارف</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
@@ -1431,13 +1437,19 @@
         </url>
       
         <url>
+          <loc>http://localhost:3000/book/مستعمل</loc>
+          <changefreq>weekly</changefreq>
+          <priority>0.8</priority>
+        </url>
+      
+        <url>
           <loc>http://localhost:3000/book/كتاب-الصيام-فتاوي-واحكام</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/أسباب-النزول-وكيف-تحفظ-القرآن</loc>
+          <loc>http://localhost:3000/book/محمود-المصري</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -1467,7 +1479,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/ألف-قصة-وقصة-من-قصص-الصالحين</loc>
+          <loc>http://localhost:3000/book/الف-قصه-وقصه</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -1599,7 +1611,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/عندما-التقيت-عمر-بن-الخطاب</loc>
+          <loc>http://localhost:3000/book/عمر-بن-الخطاب</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -1647,7 +1659,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/الفتح-الرباني-في-تيسير-تلاوة-القرآن</loc>
+          <loc>http://localhost:3000/book/الفتح-الرباني</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -2055,6 +2067,12 @@
         </url>
       
         <url>
+          <loc>http://localhost:3000/book/التواصل-غير-العنيف-لغة-الحياة</loc>
+          <changefreq>weekly</changefreq>
+          <priority>0.8</priority>
+        </url>
+      
+        <url>
           <loc>http://localhost:3000/book/فن-الإغواء</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
@@ -2157,7 +2175,7 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/الفيزياء-بين-البساطة-والدهاء</loc>
+          <loc>http://localhost:3000/book/الفيزياء-بين-البساطة</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
@@ -3046,6 +3064,30 @@
       
         <url>
           <loc>http://localhost:3000/book/زاد-المعاد-في-هدي-خير-العباد</loc>
+          <changefreq>weekly</changefreq>
+          <priority>0.8</priority>
+        </url>
+      
+        <url>
+          <loc>http://localhost:3000/book/ازمة-تعلق</loc>
+          <changefreq>weekly</changefreq>
+          <priority>0.8</priority>
+        </url>
+      
+        <url>
+          <loc>http://localhost:3000/book/فاتتني-صلاة</loc>
+          <changefreq>weekly</changefreq>
+          <priority>0.8</priority>
+        </url>
+      
+        <url>
+          <loc>http://localhost:3000/book/الجريمة-والعقاب</loc>
+          <changefreq>weekly</changefreq>
+          <priority>0.8</priority>
+        </url>
+      
+        <url>
+          <loc>http://localhost:3000/book/آن</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>

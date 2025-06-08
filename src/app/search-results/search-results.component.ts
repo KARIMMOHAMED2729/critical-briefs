@@ -236,6 +236,15 @@ this.http.get<{ bookId: string; averageRating: number; ratingCount: number }>(`$
         const normalizedProductName = this.normalizeArabic(book.product_name.toLowerCase());
         return normalizedProductName.includes(normalizedQuery);
       });
+      // Sort filteredBooks to prioritize books starting with the exact original query
+      const originalQueryLower = this.searchQuery.toLowerCase();
+      filteredBooks.sort((a: Book, b: Book) => {
+        const aStarts = a.product_name.toLowerCase().startsWith(originalQueryLower);
+        const bStarts = b.product_name.toLowerCase().startsWith(originalQueryLower);
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return 1;
+        return 0;
+      });
       this.totalBooks = filteredBooks.length;
       this.books = filteredBooks.slice((this.currentPage - 1) * this.booksPerPage, this.currentPage * this.booksPerPage);
       this.fetchRatingsForBooks(); // Fetch ratings after books are loaded

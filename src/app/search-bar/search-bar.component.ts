@@ -41,6 +41,15 @@ export class SearchBarComponent {
         const normalizedProductName = this.normalizeArabic(book.product_name.toLowerCase());
         return normalizedProductName.includes(normalizedQuery);
       });
+      // Sort results to prioritize books starting with the exact original query
+      const originalQueryLower = this.searchQuery.toLowerCase();
+      this.searchResults.sort((a, b) => {
+        const aStarts = a.product_name.toLowerCase().startsWith(originalQueryLower);
+        const bStarts = b.product_name.toLowerCase().startsWith(originalQueryLower);
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return 1;
+        return 0;
+      });
     } else {
       this.searchResults = [];
     }
