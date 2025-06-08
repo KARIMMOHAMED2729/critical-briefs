@@ -226,7 +226,9 @@ this.http.get<{ bookId: string; averageRating: number; ratingCount: number }>(`$
   }
   // دالة البحث لحظيًا
   private normalizeArabic(text: string): string {
-    return text.replace(/[أإآ]/g, 'ا');
+    return text
+      .replace(/[أإآ]/g, 'ا')
+      .replace(/[هة]/g, 'ه');
   }
 
   searchBooks(): void {

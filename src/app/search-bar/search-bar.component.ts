@@ -31,7 +31,9 @@ export class SearchBarComponent {
   }
 
   private normalizeArabic(text: string): string {
-    return text.replace(/[أإآ]/g, 'ا');
+    return text
+      .replace(/[أإآ]/g, 'ا')
+      .replace(/[هة]/g, 'ه');
   }
 
   onSearchKeyup() {

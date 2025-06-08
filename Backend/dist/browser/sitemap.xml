@@ -1221,12 +1221,6 @@
         </url>
       
         <url>
-          <loc>http://localhost:3000/book/آن</loc>
-          <changefreq>weekly</changefreq>
-          <priority>0.8</priority>
-        </url>
-      
-        <url>
           <loc>http://localhost:3000/book/قبل-ان-تبرد-القهوة</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
@@ -3082,12 +3076,6 @@
       
         <url>
           <loc>http://localhost:3000/book/الجريمة-والعقاب</loc>
-          <changefreq>weekly</changefreq>
-          <priority>0.8</priority>
-        </url>
-      
-        <url>
-          <loc>http://localhost:3000/book/آن</loc>
           <changefreq>weekly</changefreq>
           <priority>0.8</priority>
         </url>
