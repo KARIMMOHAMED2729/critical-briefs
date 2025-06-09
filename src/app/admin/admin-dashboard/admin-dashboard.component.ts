@@ -279,7 +279,12 @@ export class AdminDashboardComponent implements OnInit {
       return this.allProducts;
     }
     const lowerSearch = this.searchTerm.toLowerCase();
-    return this.allProducts.filter(p => p.product_name.toLowerCase().includes(lowerSearch));
+    return this.allProducts.filter(p => {
+      if (!p.product_name || typeof p.product_name !== 'string') {
+        return false;
+      }
+      return p.product_name.toLowerCase().includes(lowerSearch);
+    });
   }
 
   updateProductsPage(): void {

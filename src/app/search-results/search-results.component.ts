@@ -228,13 +228,21 @@ this.http.get<{ bookId: string; averageRating: number; ratingCount: number }>(`$
   private normalizeArabic(text: string): string {
     return text
       .replace(/[أإآ]/g, 'ا')
-      .replace(/[هة]/g, 'ه');
+      .replace(/[هة]/g, 'ه')
+      // Remove special characters except numbers and letters
+      .replace(/[^0-9a-zA-Z\u0600-\u06FF\s]/g, '')
+      // Remove extra spaces
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   searchBooks(): void {
     this.dataService.getData().subscribe(data => {
       const normalizedQuery = this.normalizeArabic(this.searchQuery.toLowerCase());
       const filteredBooks = data.filter((book: Book) => {
+        if (!book.product_name || typeof book.product_name !== 'string') {
+          return false;
+        }
         const normalizedProductName = this.normalizeArabic(book.product_name.toLowerCase());
         return normalizedProductName.includes(normalizedQuery);
       });

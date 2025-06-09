@@ -33,13 +33,21 @@ export class SearchBarComponent {
   private normalizeArabic(text: string): string {
     return text
       .replace(/[أإآ]/g, 'ا')
-      .replace(/[هة]/g, 'ه');
+      .replace(/[هة]/g, 'ه')
+      // Remove special characters except numbers and letters
+      .replace(/[^0-9a-zA-Z\u0600-\u06FF\s]/g, '')
+      // Remove extra spaces
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   onSearchKeyup() {
     if (this.searchQuery.trim()) {
       const normalizedQuery = this.normalizeArabic(this.searchQuery.toLowerCase());
       this.searchResults = this.allBooks.filter(book => {
+        if (!book.product_name || typeof book.product_name !== 'string') {
+          return false;
+        }
         const normalizedProductName = this.normalizeArabic(book.product_name.toLowerCase());
         return normalizedProductName.includes(normalizedQuery);
       });
@@ -52,8 +60,10 @@ export class SearchBarComponent {
         if (!aStarts && bStarts) return 1;
         return 0;
       });
+      this.searchExecuted.emit(this.searchQuery.trim());
     } else {
       this.searchResults = [];
+      this.searchExecuted.emit('');
     }
   }
 
