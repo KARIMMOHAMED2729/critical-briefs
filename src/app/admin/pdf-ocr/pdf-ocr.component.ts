@@ -69,6 +69,9 @@ export class PdfOcrComponent implements OnInit {
   }
 
 
+  epubDownloadUrl: string | null = null;
+  wordDownloadUrl: string | null = null;
+
   onConvert(): void {
     if (!this.selectedFile) {
       this.errorMessage = 'No PDF file selected.';
@@ -85,6 +88,8 @@ export class PdfOcrComponent implements OnInit {
     this.uploading = true;
     this.uploadProgress = 0;
     this.uploadSuccess = false;
+    this.epubDownloadUrl = null;
+    this.wordDownloadUrl = null;
 
     // Rename the file to selectedBookName.pdf before upload
     const renamedFile = new File([this.selectedFile], `${this.selectedBookName}.pdf`, { type: 'application/pdf' });
@@ -93,7 +98,7 @@ export class PdfOcrComponent implements OnInit {
     formData.append('file', renamedFile);
     formData.append('projectName', this.selectedBookName);
 
-    this.http.post<{ text: string }>('/api/pdf-ocr/upload', formData, {
+    this.http.post<{ text: string, epubPath?: string, wordPath?: string }>('/api/pdf-ocr/upload', formData, {
       reportProgress: true,
       observe: 'events'
     }).subscribe({
@@ -106,6 +111,8 @@ export class PdfOcrComponent implements OnInit {
           this.isLoading = false;
           this.uploading = false;
           this.uploadSuccess = true;
+          this.epubDownloadUrl = event.body?.epubPath || null;
+          this.wordDownloadUrl = event.body?.wordPath || null;
         }
       },
       error: (error) => {

@@ -6,14 +6,49 @@ const { PDFDocument } = require('pdf-lib');
 const { exec } = require('child_process');
 const Tesseract = require('tesseract.js');
 const Epub = require('epub-gen');
+const { Document, Packer, Paragraph, TextRun, AlignmentType } = require('docx');
+const levenshtein = require('fast-levenshtein');
 
 const uploadsDir = path.join(__dirname, '../uploads/');
 const epubDir = path.join(uploadsDir, 'epub');
+const wordDir = path.join(uploadsDir, 'word');
+
 
 // Path to the Quranic JISOL file
 const quranJisolPath = path.join(__dirname, '../upload/quran.jisol'); // Corrected path based on user upload
 let quranJisol = null;
 let quranicWhitelist = '';
+
+// Load Tanzil Quranic dataset (using quran-simple.txt as base)
+const quranDataPath = path.join(__dirname, '../quranic-data/quran-simple.txt');
+let quranVerses = [];
+
+function loadQuranVerses() {
+  try {
+    if (fs.existsSync(quranDataPath)) {
+      const data = fs.readFileSync(quranDataPath, 'utf8');
+      // Tanzil quran-simple.txt format: each line is "sura:ayah text"
+      // Example: "1:1 بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ"
+      quranVerses = data.split('\n').map(line => {
+        const sepIndex = line.indexOf(' ');
+        if (sepIndex > 0) {
+          const verseId = line.substring(0, sepIndex).trim();
+          const verseText = line.substring(sepIndex + 1).trim();
+          return { id: verseId, text: verseText };
+        }
+        return null;
+      }).filter(v => v !== null);
+      console.log(`Loaded ${quranVerses.length} Quranic verses from Tanzil dataset.`);
+    } else {
+      console.warn(`Quranic data file not found at ${quranDataPath}. Quranic verse matching disabled.`);
+    }
+  } catch (err) {
+    console.error('Failed to load or parse Quranic data file:', err);
+  }
+}
+
+// Call once on module load
+loadQuranVerses();
 
 try {
   if (fs.existsSync(quranJisolPath)) {
@@ -23,24 +58,19 @@ try {
     // Dynamically build the whitelist from JISOL data
     const allQuranicChars = [
       ...(quranJisol.characters || []),
-      // Split ligatures into individual chars for whitelist if needed, but Tesseract might handle them
-      // ...(quranJisol.ligatures || []).join('').split(''),
       ...(quranJisol.ligatures || []), // Include full ligatures in whitelist
       ...(quranJisol.diacritics || [])
     ];
     const additionalChars = '0123456789.,;:?!\'"()[]{}-–—\n '; // Keep essential punctuation and numbers
-    // Combine, ensure uniqueness, and join into a string
-    quranicWhitelist = [...new Set([...allQuranicChars, ...additionalChars.split('')])].join('');
+    const englishChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    quranicWhitelist = [...new Set([...allQuranicChars, ...additionalChars.split(''), ...englishChars.split('')])].join('');
     console.log('Successfully loaded Quranic JISOL and generated whitelist.');
-    // console.log('Whitelist:', quranicWhitelist); // Optional: Log whitelist for debugging
   } else {
     console.warn(`Quranic JISOL file not found at ${quranJisolPath}. Using default Arabic whitelist.`);
-    // Fallback to a default comprehensive Arabic whitelist if JISOL is not found
-    quranicWhitelist = 'ابتثجحخدذرزسشصضطظعغفقكلمنهويءآأإؤئلاىةۖۗۘۙۚۛۜ۝ًٌٍَُِّْ0123456789.,;:?!\'"()[]{}-–—\n ';
+    quranicWhitelist = 'ابتثجحخدذرزسشصضطظعغفقكلمنهويءآأإؤئلاىةۖۗۘۙۚۛۜ۝ًٌٍَُِّْ0123456789.,;:?!\'"()[]{}-–—\n ' + 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   }
 } catch (err) {
   console.error('Failed to load or parse Quranic JISOL file:', err);
-  // Fallback to a default comprehensive Arabic whitelist on error
   quranicWhitelist = 'ابتثجحخدذرزسشصضطظعغفقكلمنهويءآأإؤئلاىةۖۗۘۙۚۛۜ۝ًٌٍَُِّْ0123456789.,;:?!\'"()[]{}-–—\n ';
   console.warn('Using default Arabic whitelist due to error.');
 }
@@ -48,33 +78,30 @@ try {
 // Multer storage configuration
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // Ensure the epub directory exists
     if (!fs.existsSync(epubDir)) {
       fs.mkdirSync(epubDir, { recursive: true });
+    }
+    if (!fs.existsSync(wordDir)) {
+      fs.mkdirSync(wordDir, { recursive: true });
     }
     cb(null, epubDir);
   },
   filename: function (req, file, cb) {
-    // Decode filename assuming it might be URL-encoded or latin1 from browser
     let originalName = file.originalname;
     try {
-      // Try decoding as UTF-8, falling back from latin1 if needed
       originalName = Buffer.from(originalName, 'latin1').toString('utf8');
     } catch (e) {
-      console.warn('Could not decode filename as UTF-8 from latin1, trying direct UTF-8:', file.originalname);
       try {
-         // Sometimes the filename is already UTF-8 but misinterpreted
          originalName = Buffer.from(file.originalname, 'binary').toString('utf8');
       } catch (e2) {
-        console.error('Failed to decode filename entirely, using original:', file.originalname);
-        originalName = file.originalname; // Fallback to original if all decoding fails
+        originalName = file.originalname;
       }
     }
-    // Sanitize filename to prevent path traversal or invalid characters
-    originalName = path.basename(originalName).replace(/[^a-zA-Z0-9\.\-\u0600-\u06FF\s]/g, '_'); // Allow Arabic letters, numbers, dots, hyphens, spaces
+    originalName = path.basename(originalName).replace(/[^a-zA-Z0-9\.\-\u0600-\u06FF\s]/g, '_');
     cb(null, originalName);
   }
 });
+
 
 // File filter
 const fileFilter = (req, file, cb) => {
@@ -151,16 +178,11 @@ async function runOcrOnImages(images) {
   let fullText = '';
   console.log(`Running OCR on ${images.length} images using 'ara' language and whitelist...`);
 
-  // Create a worker for Tesseract
   const worker = await Tesseract.createWorker('ara', 1, {
-    logger: m => { /* console.log(m) */ }, // Suppress or enable detailed logging
-    // Use the dynamically generated or fallback whitelist
+    logger: m => { },
     tessedit_char_whitelist: quranicWhitelist,
-    // OEM 1 (LSTM only) is generally better for scripts like Arabic
-    // PSM Auto (3) is a good start. PSM 4 (single column) or 6 (single block) might be better for specific layouts.
     tessedit_ocr_engine_mode: Tesseract.OEM.LSTM_ONLY,
     tessedit_pageseg_mode: Tesseract.PSM.AUTO,
-    // Preserve interword spaces - might be important for Arabic
     preserve_interword_spaces: '1',
   });
 
@@ -168,16 +190,17 @@ async function runOcrOnImages(images) {
     const imagePath = images[i];
     try {
       const { data: { text } } = await worker.recognize(imagePath);
-      fullText += text + '\n\n'; // Add double newline between pages for paragraph separation
+      fullText += text + '\n\n';
     } catch (ocrError) {
       console.error(`OCR error on image ${imagePath}:`, ocrError);
-      fullText += `[OCR Error on page ${i + 1}]\n\n`; // Add error marker
+      fullText += `[OCR Error on page ${i + 1}]\n\n`;
     }
   }
   await worker.terminate();
   console.log('OCR process completed.');
   return fullText;
 }
+
 
 // Helper function to generate EPUB
 function generateEpub(outputPath, text, title) {
@@ -224,6 +247,44 @@ function generateEpub(outputPath, text, title) {
   });
 }
 
+// Helper function to generate Word document
+async function generateWord(outputPath, text) {
+  const doc = new Document({
+    sections: [
+      {
+        properties: {},
+        children: text.split('\n').filter(line => line.trim().length > 0).map(line => {
+          return new Paragraph({
+            children: [
+              new TextRun({
+                text: line,
+                font: "Amiri",
+                size: 28, // 14pt (half-points)
+                rightToLeft: true,
+              }),
+            ],
+            alignment: AlignmentType.JUSTIFIED,
+            spacing: { after: 200 },
+          });
+        }),
+      },
+    ],
+  });
+
+  const buffer = await Packer.toBuffer(doc);
+  return new Promise((resolve, reject) => {
+    fs.writeFile(outputPath, buffer, (err) => {
+      if (err) {
+        console.error('Word document generation error:', err);
+        reject(err);
+      } else {
+        console.log('Word document generated successfully.');
+        resolve();
+      }
+    });
+  });
+}
+
 // Helper function to clean text (basic cleaning)
 function cleanText(text) {
   console.log('Cleaning extracted text...');
@@ -243,11 +304,53 @@ function cleanText(text) {
   return cleaned;
 }
 
+
+// Function to replace approximate Quranic verses in text with accurate verses from quranVerses dataset
+function replaceQuranicVerses(text) {
+  if (!text || !quranVerses || quranVerses.length === 0) {
+    return text;
+  }
+
+  // Split text into lines for processing
+  const lines = text.split('\n');
+  const maxDistance = 5; // Maximum Levenshtein distance to consider a match
+
+  // For performance, create a map of verse texts to ids for quick lookup
+  const verseTexts = quranVerses.map(v => v.text);
+
+  // Process each line and try to replace with closest matching verse
+  const replacedLines = lines.map(line => {
+    if (!line.trim()) return line;
+
+    // Find the closest verse text by Levenshtein distance
+    let closestVerse = null;
+    let closestDistance = Infinity;
+
+    for (const verse of quranVerses) {
+      const distance = levenshtein.get(line, verse.text);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestVerse = verse;
+      }
+      if (closestDistance === 0) break; // Exact match found
+    }
+
+    // If close enough, replace line with accurate verse text
+    if (closestDistance <= maxDistance) {
+      return closestVerse.text;
+    }
+
+    return line;
+  });
+
+  return replacedLines.join('\n');
+}
+
 // Main controller function
 exports.uploadAndProcessPdf = (req, res) => {
   console.log('Starting uploadAndProcessPdf request...');
   upload(req, res, async function (err) {
-    let tempDir = null; // To ensure cleanup happens even if early errors occur
+    let tempDir = null;
     let uploadedFilePath = null;
 
     if (err instanceof multer.MulterError) {
@@ -264,69 +367,64 @@ exports.uploadAndProcessPdf = (req, res) => {
         console.error('No file uploaded in the request.');
         return res.status(400).json({ success: false, message: 'No file uploaded' });
       }
-      uploadedFilePath = file.path; // Keep track of the uploaded file path
-  // console.log(`File received: ${file.filename}, Path: ${uploadedFilePath}`);
+      uploadedFilePath = file.path;
 
-  // 1. Convert PDF to Images
-  const conversionResult = await convertPdfToImages(uploadedFilePath);
-  const images = conversionResult.images;
-  tempDir = conversionResult.tempDir; // Assign tempDir for cleanup
+      // 1. Convert PDF to Images
+      const conversionResult = await convertPdfToImages(uploadedFilePath);
+      const images = conversionResult.images;
+      tempDir = conversionResult.tempDir;
 
-  if (images.length === 0) {
-    // Error already logged in convertPdfToImages if it failed
-    // No need to delete uploadedFilePath here as it's the final destination in epubDir
-    if (fs.existsSync(tempDir)) fs.rmSync(tempDir, { recursive: true, force: true });
-    return res.status(500).json({ success: false, message: 'Failed to extract any images from the PDF. It might be empty, image-based without text layer, or corrupted.' });
-  }
+      if (images.length === 0) {
+        if (fs.existsSync(tempDir)) fs.rmSync(tempDir, { recursive: true, force: true });
+        return res.status(500).json({ success: false, message: 'Failed to extract any images from the PDF.' });
+      }
 
-  // 2. Run OCR on Images
-  let extractedText = await runOcrOnImages(images);
+      // 2. Run OCR on Images
+      let extractedText = await runOcrOnImages(images);
 
-  // 3. Clean Extracted Text
-  extractedText = cleanText(extractedText);
+      // 3. Clean Extracted Text
+      extractedText = cleanText(extractedText);
 
-  // 4. Generate EPUB
-  // Use the sanitized original filename (stored in file.filename by multer config)
-  const baseName = path.basename(file.filename, path.extname(file.filename));
-  const outputEpubPath = path.join(epubDir, `${baseName}.epub`);
-  await generateEpub(outputEpubPath, extractedText, baseName);
+      // 4. Replace Quranic verses with accurate text
+      extractedText = replaceQuranicVerses(extractedText);
 
-  // 5. Clean up temporary image directory
-  // console.log('Cleaning up temporary image files...');
-  if (fs.existsSync(tempDir)) {
-    fs.rmSync(tempDir, { recursive: true, force: true });
-    // console.log(`Removed temp image directory: ${tempDir}`);
-  }
+      // 5. Generate EPUB
+      const baseName = path.basename(file.filename, path.extname(file.filename));
+      const outputEpubPath = path.join(epubDir, `${baseName}.epub`);
+      await generateEpub(outputEpubPath, extractedText, baseName);
 
-  // Delete the uploaded PDF file after EPUB creation
-  try {
-    if (uploadedFilePath && fs.existsSync(uploadedFilePath)) {
-      fs.unlinkSync(uploadedFilePath);
-      // console.log(`Deleted uploaded PDF file: ${uploadedFilePath}`);
-    }
-  } catch (deleteErr) {
-    console.error(`Failed to delete uploaded PDF file: ${deleteErr.message}`);
-  }
+      // 6. Generate Word document
+      const outputWordPath = path.join(wordDir, `${baseName}.docx`);
+      await generateWord(outputWordPath, extractedText);
 
-  // console.log('Processing finished successfully.');
-  // Send back the path to the generated EPUB or the text itself
-  res.status(200).json({ 
-    success: true, 
-    message: 'PDF processed successfully.',
-    epubPath: `/uploads/epub/${baseName}.epub`, // Relative path for client access
-    text: extractedText // Changed property name to 'text' to match frontend expectation
-  });
+      // 7. Clean up temporary image directory
+      if (fs.existsSync(tempDir)) {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+
+      // Delete the uploaded PDF file after processing
+      try {
+        if (uploadedFilePath && fs.existsSync(uploadedFilePath)) {
+          fs.unlinkSync(uploadedFilePath);
+        }
+      } catch (deleteErr) {
+        console.error(`Failed to delete uploaded PDF file: ${deleteErr.message}`);
+      }
+
+      // Send back the paths to the generated EPUB and Word files
+      res.status(200).json({
+        success: true,
+        message: 'PDF processed successfully.',
+        epubPath: `/uploads/epub/${baseName}.epub`,
+        wordPath: `/uploads/word/${baseName}.docx`,
+        text: extractedText
+      });
 
     } catch (error) {
       console.error('Error during PDF processing pipeline:', error);
-      // Ensure cleanup happens on error
       if (fs.existsSync(tempDir)) {
-        console.log(`Cleaning up temp directory due to error: ${tempDir}`);
         fs.rmSync(tempDir, { recursive: true, force: true });
       }
-      // We might not want to delete the uploaded PDF on error, maybe user wants to retry?
-      // If you want to delete it: if (uploadedFilePath && fs.existsSync(uploadedFilePath)) fs.unlinkSync(uploadedFilePath);
-      
       res.status(500).json({ success: false, message: 'Server error during processing.', error: error.message });
     }
   });
