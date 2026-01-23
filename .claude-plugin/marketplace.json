@@ -1,0 +1,42 @@
+{
+  "name": "critical-briefs",
+  "owner": {
+    "name": "CampusAI",
+    "email": "info@campus.ai"
+  },
+  "metadata": {
+    "description": "Agent Skills for Claude AI that validate business ideas, stress-test processes, and design MVPs through skeptical dialogue",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "critical-briefs",
+      "description": "Create critical briefs through challenging dialogue: business validation (critical-business-brief), operational process analysis (critical-process-brief), and MVP application design (critical-app-brief). Each skill creates structured briefs that expose weaknesses, test assumptions, and cut scope ruthlessly.",
+      "version": "1.0.0",
+      "author": {
+        "name": "CampusAI",
+        "email": "info@campus.ai"
+      },
+      "homepage": "https://github.com/Przemocny/critical-briefs",
+      "repository": "https://github.com/Przemocny/critical-briefs",
+      "license": "Apache-2.0",
+      "keywords": [
+        "business-validation",
+        "process-analysis",
+        "mvp-design",
+        "critical-thinking",
+        "skeptical-dialogue",
+        "startup",
+        "entrepreneurship"
+      ],
+      "category": "productivity",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/critical-business-brief",
+        "./skills/critical-process-brief",
+        "./skills/critical-app-brief"
+      ]
+    }
+  ]
+}
