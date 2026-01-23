@@ -17,7 +17,7 @@ If you discover a security vulnerability within Critical Briefs, please follow t
 If you find that a skill generates harmful instructions or inappropriate content:
 
 1. **Do NOT** open a public issue
-2. Contact: contact@campus.ai
+2. Contact: info@campus.ai
 3. Provide:
    - Which skill is affected
    - What trigger caused the issue
@@ -29,7 +29,7 @@ If you find that a skill generates harmful instructions or inappropriate content
 For traditional security issues (malicious code, compromised dependencies, etc.):
 
 1. Open a security advisory via GitHub's private reporting
-2. Or email: contact@campus.ai
+2. Or email: info@campus.ai
 3. Include:
    - Description of the issue
    - Steps to reproduce
